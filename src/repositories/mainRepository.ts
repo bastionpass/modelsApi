@@ -1,19 +1,19 @@
 import { ModelRepository, ObservableModel } from './modelRepository';
-import { ModelTypes } from '../api/api';
 import { set } from 'mobx';
-import { ModelMetadata, ModelWithId } from '../baseTypes';
-import { CoreError } from '../coreError';
 import { ObservableOptionalModel } from './optionalModel/ObservableOptionalModel';
 import { isUnknownModelTypeError, UnknownModelTypeError } from './unknownModelTypeError';
-import { Deserializer } from 'swagger-ts-types';
+import {BaseModel, Deserializer, ModelMetadata, ModelWithId} from 'swagger-ts-types';
+import { CoreError } from '../coreError';
 
-export type ModelRepositoriesMap = Map<ModelTypes, ModelRepository<any, any, any>>;
+export type ModelRepositoriesMap<ModelTypes extends string> =
+    Map<ModelTypes, ModelRepository<any, any, any, ModelTypes>>;
 
-export class MainRepository {
+export class MainRepository<ModelTypes extends string> {
 
-  public modelRepositories: ModelRepositoriesMap = new Map();
+  public modelRepositories: ModelRepositoriesMap<ModelTypes> = new Map();
 
-  public getModelRepository<R extends ModelRepository<any, any, any>>(modelType: ModelTypes): R | undefined {
+  public getModelRepository<R extends ModelRepository<any, any, any, ModelTypes>>(modelType: ModelTypes):
+      R | undefined {
     return this.modelRepositories.get(modelType) as R;
   }
 
@@ -24,9 +24,9 @@ export class MainRepository {
    * @return {ObservableModel<ModelWithId | T> | UnknownModelTypeError}
    */
   public getModel<T extends ModelWithId> (modelType: ModelTypes, id: string)
-    : ObservableOptionalModel<T> | UnknownModelTypeError {
+    : ObservableOptionalModel<T, ModelTypes> | UnknownModelTypeError {
     const result = this.getRawModel<T>(modelType, id);
-    return isUnknownModelTypeError(result) ? result : new ObservableOptionalModel<T>(result, modelType, this);
+    return isUnknownModelTypeError(result) ? result : new ObservableOptionalModel<T, ModelTypes>(result, modelType, this);
   }
 
   /**
@@ -36,18 +36,18 @@ export class MainRepository {
    * @return {ObservableModel<ModelWithId | T> | UnknownModelTypeError}
    */
   public getRawModel = <T extends ModelWithId>(modelType: string, id: string)
-    : ObservableModel<T | ModelWithId> | UnknownModelTypeError => {
+    : ObservableModel<T | ModelWithId, ModelTypes> | UnknownModelTypeError => {
 
     const modelRepository = this.modelRepositories.get(modelType as ModelTypes);
     if (modelRepository) {
-      return modelRepository.getRawModel(id) as ObservableModel<T | ModelWithId> ;
+      return modelRepository.getRawModel(id) as ObservableModel<T | ModelWithId, ModelTypes> ;
     }
     return new UnknownModelTypeError(modelType);
 
   }
 
   public isFullModel<T extends ModelWithId>(model: T | ModelWithId, modelType: ModelTypes): model is T {
-    const modelRepository = this.modelRepositories.get(modelType) as ModelRepository<T, any, any>;
+    const modelRepository = this.modelRepositories.get(modelType) as ModelRepository<T, any, any, ModelTypes>;
     return modelRepository && modelRepository.isFullModel(model);
   }
 
@@ -69,7 +69,7 @@ export class MainRepository {
    * @param {ModelWithId} rawModel
    * @param {ModelMetadata} metadata
    */
-  public denormalizeModel = (model: ObservableModel<ModelWithId>,
+  public denormalizeModel = (model: ObservableModel<ModelWithId, ModelTypes>,
                              rawModel: ModelWithId,
                              metadata: ModelMetadata): CoreError | null => {
 
@@ -88,7 +88,7 @@ export class MainRepository {
         ` Errors: ${JSON.stringify(denormalizeResult.getErrors())}`);
   }
 
-  public registerModelRepository(modelType: ModelTypes, modelRepository: ModelRepository<any, any, any>) {
+  public registerModelRepository(modelType: ModelTypes, modelRepository: ModelRepository<any, any, any, ModelTypes>) {
     this.modelRepositories.set(modelType, modelRepository);
   }
 }

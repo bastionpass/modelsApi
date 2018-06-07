@@ -1,13 +1,14 @@
+import { CoreError } from '../coreError';
+
 /**
  * LoadState describes state of Model or List of models, whether it's being loaded from backend or
  */
-import { CoreError } from '../coreError';
 
 export class LoadState {
 
-  public static none(): NoneState {return noneState;}
-  public static pending(): PendingState {return pendingState;}
-  public static done(): DoneState {return doneState;}
+  public static none(): NoneState { return noneState; }
+  public static pending(): PendingState { return pendingState; }
+  public static done(): DoneState { return doneState; }
 
   public isNone(): this is NoneState { return this instanceof NoneState; }
   public isPending(): this is PendingState { return this instanceof PendingState; }
@@ -15,7 +16,6 @@ export class LoadState {
   public isError(): this is ErrorState { return this instanceof ErrorState; }
   public isNoneOrPending(): boolean { return this instanceof PendingState || this instanceof NoneState; }
 }
-
 
 /**
  * Nothing has been doneState with the model, it wasn't been loaded, so you cannot use it
@@ -50,6 +50,3 @@ export class ErrorState extends LoadState {
 const noneState = new NoneState();
 const pendingState = new PendingState();
 const doneState = new DoneState();
-
-
-

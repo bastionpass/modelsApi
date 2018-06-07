@@ -1,6 +1,6 @@
-import { isBaseStaticOptionalModel,StaticOptionalModel } from './staticOptionalModel';
+import { isBaseStaticOptionalModel, StaticOptionalModel } from './staticOptionalModel';
 import { isObservableModel, ModelRepository, ObservableModel } from '../modelRepository';
-import { isBaseObservableOptionType,ObservableOptionalModel } from './ObservableOptionalModel';
+import { isBaseObservableOptionType, ObservableOptionalModel } from './ObservableOptionalModel';
 import { defaultInjectNamespace, getInjected } from '../../inject/inject';
 import { MainRepository } from '../mainRepository';
 import { ModelWithId } from 'swagger-ts-types';
@@ -27,17 +27,21 @@ export interface OptionalModelWithOnEmptyOnFull<T extends ModelWithId, ER, FR> e
 }
 
 export module OptionalModel {
-  export const from = <TT extends ModelWithId, ER, FR>(
+  export const from = <TT extends ModelWithId, ER, FR, ModelType extends string>(
       src: OptionalModel<TT> | OptionalModelWithOnEmpty<TT, ER> |
     OptionalModelWithOnFull<TT, any> | OptionalModelWithOnEmptyOnFull<TT, ER, FR> |
-    ObservableModel<TT> | TT | undefined | null,
+    ObservableModel<TT, ModelType> | TT | undefined | null,
   ): OptionalModel<TT> => {
 
-    if (isBaseObservableOptionType(src)) {
-      return new ObservableOptionalModel<TT>(src.getModel(), src.getModelType(), src.getMainRepository());
+    if (isBaseObservableOptionType<ModelType>(src)) {
+      return new ObservableOptionalModel<TT, ModelType>(
+          src.getModel(),
+          src.getModelType(),
+          src.getMainRepository(),
+      );
     } else if (isObservableModel(src)) {
-      const mainRepository = getInjected(defaultInjectNamespace, MainRepository);
-      return new ObservableOptionalModel<TT>(src, src._modelType, mainRepository);
+      const mainRepository = getInjected<MainRepository<ModelType>>(defaultInjectNamespace, MainRepository);
+      return new ObservableOptionalModel<TT, ModelType>(src, src._modelType, mainRepository);
     } else if (isBaseStaticOptionalModel(src)) {
       return new StaticOptionalModel(src.getModel());
     } else {

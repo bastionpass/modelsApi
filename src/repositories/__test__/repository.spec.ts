@@ -1,7 +1,5 @@
-import { ModelMetadata } from '../../baseTypes';
 import { ModelRepository, ObservableModel } from '../modelRepository';
 import { MainRepository } from '../mainRepository';
-import { ModelTypes } from '../../api/api';
 import { DoneState, ErrorState, LoadState } from '../loadState';
 import { autorun, isObservable } from 'mobx';
 import { isUnknownModelTypeError } from '../unknownModelTypeError';
@@ -9,10 +7,11 @@ import { ModelList, ModelListImpl } from '../modelList';
 import { ObservableOptionalModel } from '../optionalModel/ObservableOptionalModel';
 import { Log, LogLevel } from '../../log/log';
 import { initializeInject, InjectionMap } from '../../inject/inject';
-import { DEBUG_LEVEL } from '../../../../apiUrls';
-import { isObject, ModelWithId } from 'swagger-ts-types';
+import { isObject, ModelMetadata, ModelWithId } from 'swagger-ts-types';
 
 const modelType = 'ModelType';
+
+type ModelTypes = 'ModelType';
 
 interface MyModel {
   id: string;
@@ -79,9 +78,10 @@ interface MyModelRequestResponse {
 
 class MyModelRepository extends ModelRepository<MyModel,
   MyModelRequestResponse,
-  MyModelRequestResponse> {
+  MyModelRequestResponse,
+  ModelTypes> {
 
-  constructor(mainRepository: MainRepository) {
+  constructor(mainRepository: MainRepository<ModelTypes>) {
     super(myModelMetadata.modelType as ModelTypes, myModelMetadata, isMyModel, mainRepository);
   }
 
@@ -135,7 +135,7 @@ initializeInject(new InjectionMap([
 describe('Repositories', () => {
   it('Repository sanity check.', () => {
 
-    const mainRepository = new MainRepository();
+    const mainRepository = new MainRepository<ModelTypes>();
     mainRepository.registerModelRepository(modelType as ModelTypes, new MyModelRepository(mainRepository));
 
     const result = mainRepository.getRawModel(modelType as ModelTypes, modelId);
@@ -151,12 +151,11 @@ describe('Repositories', () => {
 
     jest.setTimeout(500);
 
-    return new Promise<ObservableModel<MyModel>>((resolve) => {
+    return new Promise<ObservableModel<MyModel, ModelTypes>>((resolve) => {
       if (!isUnknownModelTypeError(result)) {
-        const disposer = autorun(() => {
-          if (!result._loadState.isPending()) {
-            disposer();
-            resolve(result as ObservableModel<MyModel>);
+        autorun(() => {
+          if (!result._loadState.isNoneOrPending()) {
+            resolve(result as ObservableModel<MyModel, ModelTypes>);
           }
         });
       }
@@ -166,19 +165,16 @@ describe('Repositories', () => {
     });
   });
 
-
-
   it('Repository reaction on bad models from backend', () => {
     expect.assertions(6);
 
-    const mainRepository = new MainRepository();
+    const mainRepository = new MainRepository<ModelTypes>();
     mainRepository.registerModelRepository(modelType as ModelTypes, new BadMyModelRepository(mainRepository));
 
     {
-      const badRepo = mainRepository.getModelRepository<BadMyModelRepository>('Account');
+      const badRepo = mainRepository.getModelRepository<BadMyModelRepository>('Account' as ModelTypes);
       expect(badRepo).toEqual(void 0);
     }
-
 
     const repo = mainRepository.getModelRepository<BadMyModelRepository>(modelType as ModelTypes);
     expect(repo).toBeInstanceOf(BadMyModelRepository);
@@ -204,16 +200,10 @@ describe('Repositories', () => {
   });
 
   it('Repository reaction on good models from backend', () => {
-    expect.assertions(6);
+    expect.assertions(5);
 
-    const mainRepository = new MainRepository();
+    const mainRepository = new MainRepository<ModelTypes>();
     mainRepository.registerModelRepository(modelType as ModelTypes, new MyModelRepository(mainRepository));
-
-    {
-      const badRepo = mainRepository.getModelRepository<MyModelRepository>('Account');
-      expect(badRepo).toEqual(void 0);
-    }
-
 
     const repo = mainRepository.getModelRepository<MyModelRepository>(modelType as ModelTypes);
     expect(repo).toBeInstanceOf(MyModelRepository);
@@ -242,7 +232,7 @@ describe('Repositories', () => {
 
     expect.assertions(5);
 
-    const mainRepository = new MainRepository();
+    const mainRepository = new MainRepository<ModelTypes>();
     mainRepository.registerModelRepository(modelType as ModelTypes, new MyModelRepository(mainRepository));
 
     const optionalModel = mainRepository.getModel(modelType as ModelTypes, modelId);
@@ -265,11 +255,10 @@ describe('Repositories', () => {
 
       jest.setTimeout(500);
 
-      return new Promise<ObservableOptionalModel<ModelWithId>>((resolve) => {
+      return new Promise<ObservableOptionalModel<ModelWithId, ModelTypes>>((resolve) => {
 
-        const disposer = autorun(() => {
-          if (!optionalModel.getModel()._loadState.isPending()) {
-            disposer();
+        autorun(() => {
+          if (!optionalModel.getModel()._loadState.isNoneOrPending()) {
             resolve(optionalModel);
           }
         });
@@ -280,4 +269,3 @@ describe('Repositories', () => {
   });
 
 });
-

@@ -1,24 +1,22 @@
 import { IObservableObject, observable, set } from 'mobx';
-import { ModelTypes } from '../api/api';
 import { ObservableValue } from 'mobx/lib/types/observablevalue';
 import { ErrorState, LoadState } from './loadState';
 import { MainRepository } from './mainRepository';
-import { ApiError } from '../apiError';
 import { CoreError } from '../coreError';
 import { ObservableOptionalModel } from './optionalModel/ObservableOptionalModel';
-import isObject = require('lodash/fp/isObject');
 import { FilteredModelListImpl, ModelList, ModelListImpl } from './modelList';
 import { CustomRepository } from './customRepository';
 import { inject } from '../inject/inject';
 import { Log } from '../log/log';
-import {isNewModel, ModelMetadata, ModelWithId, newModelId, serialize} from 'swagger-ts-types';
+import {isModelWithId, isNewModel, isObject, ModelMetadata, ModelWithId, newModelId, serialize} from 'swagger-ts-types';
 
-export type ObservableModel<T extends ModelWithId> = T & IObservableObject & {
+export type ObservableModel<T extends ModelWithId, ModelTypes extends string> = T & IObservableObject & {
   _loadState: LoadState;
   _modelType: ModelTypes;
 };
 
-export function isObservableModel<T extends ModelWithId>(arg: any): arg is ObservableModel<T> {
+export function isObservableModel<T extends ModelWithId, ModelTypes extends string>(arg: any):
+    arg is ObservableModel<T, ModelTypes> {
   return isObject(arg) && arg._loadState instanceof LoadState && arg._modelType;
 }
 
@@ -28,7 +26,8 @@ const defaultList = 'all';
 export abstract class ModelRepository<
   T extends ModelWithId,
   CreateRequest,
-  UpdateRequest> extends CustomRepository {
+  UpdateRequest,
+  ModelTypes extends string> extends CustomRepository<ModelTypes> {
 
   @inject
   protected log: Log;
@@ -37,17 +36,17 @@ export abstract class ModelRepository<
   protected modelMetadata: ModelMetadata;
 
   @observable.shallow
-  protected allModels: Map<string, ObservableModel<T>> = new Map();
+  protected allModels: Map<string, ObservableModel<T, ModelTypes>> = new Map();
 
   @observable.shallow
-  protected lists: Map<string, ModelListImpl<ObservableModel<T>>> = new Map();
+  protected lists: Map<string, ModelListImpl<ObservableModel<T, ModelTypes>>> = new Map();
 
   private fetchPromises: Map<Object, Promise<any>> = new Map();
 
   constructor(modelType: ModelTypes,
               modelMetadata: ModelMetadata,
               protected isModel: (arg: any) => boolean,
-              mainRepository: MainRepository) {
+              mainRepository: MainRepository<ModelTypes>) {
     super(mainRepository);
     mainRepository.registerModelRepository(modelType, this);
     this.modelType = modelType;
@@ -62,7 +61,7 @@ export abstract class ModelRepository<
    * @param {string} id
    * @return {ObservableValue<T extends ModelWithId>}
    */
-  public getModel(id: string): ObservableOptionalModel<T> {
+  public getModel(id: string): ObservableOptionalModel<T, ModelTypes> {
     return new ObservableOptionalModel(this.getRawModel(id), this.modelType, this.mainRepository);
   }
 
@@ -71,10 +70,10 @@ export abstract class ModelRepository<
    * @param {string} id
    * @return {ObservableModel<ModelWithId | T>}
    */
-  public getRawModel(id: string, autoLoad: boolean = true): ObservableModel<T | ModelWithId> {
+  public getRawModel(id: string, autoLoad: boolean = true): ObservableModel<T | ModelWithId, ModelTypes> {
     // Try to get existing model
     const model = this.getExistingModel(id);
-    if (autoLoad && !model._loadState.isNone()) {
+    if (autoLoad && model._loadState.isNone()) {
       setImmediate(() => this.loadModel(model));
     }
     return model;
@@ -92,7 +91,7 @@ export abstract class ModelRepository<
    * Use this method to create and later save a new model
    * @return {ObservableModel<T extends ModelWithId>}
    */
-  public createNewModel(): ObservableModel<T | ModelWithId> {
+  public createNewModel(): ObservableModel<T | ModelWithId, ModelTypes> {
     return this.createEmptyModel(newModelId);
   }
 
@@ -103,7 +102,7 @@ export abstract class ModelRepository<
    * @param saveModel
    * @return {Promise<void>}
    */
-  public createOrUpdate(model: ObservableModel<T>, saveModel: CreateRequest | UpdateRequest) {
+  public createOrUpdate(model: ObservableModel<T, ModelTypes>, saveModel: CreateRequest | UpdateRequest) {
     let apiPromise: Promise<any>;
 
     // TODO: add type checking for saveModel and isNewModel
@@ -128,7 +127,7 @@ export abstract class ModelRepository<
         this.allModels.set(model.id, model);
       }
 
-    }).catch((error: ApiError) => {
+    }).catch((error: CoreError) => {
       model._loadState = new ErrorState(error);
       throw error;
     });
@@ -152,7 +151,7 @@ export abstract class ModelRepository<
           }
         }
       }
-    }).catch((apiError: ApiError) => {
+    }).catch((apiError: CoreError) => {
       if (realModel) {
         model._loadState = new ErrorState(apiError);
       }
@@ -160,7 +159,7 @@ export abstract class ModelRepository<
     });
   }
 
-  public getExistingModel(id: string): ObservableModel<T> {
+  public getExistingModel(id: string): ObservableModel<T, ModelTypes> {
     const existingModel = this.allModels.get(id);
 
     if (existingModel) {
@@ -180,7 +179,7 @@ export abstract class ModelRepository<
    * @param {string} name
    * @return {ModelList<ObservableModel<T extends ModelWithId>> & IObservableObject}
    */
-  public getList(name: string = defaultList, autoload: boolean = true): ModelList<ObservableModel<T>> {
+  public getList(name: string = defaultList, autoload: boolean = true): ModelList<ObservableModel<T, ModelTypes>> {
     return this.getListImpl(name, void 0, autoload);
   }
 
@@ -203,7 +202,7 @@ export abstract class ModelRepository<
    * @return {ModelListImpl<ObservableModel<T extends ModelWithId>>}
    */
   public getListImpl(name: string = defaultList, filter?: Partial<T>, autoload: boolean = true):
-    ModelListImpl<ObservableModel<T>> {
+    ModelListImpl<ObservableModel<T, ModelTypes>> {
     const list = this.getExistingListImpl(name, filter);
 
     if (autoload && list.loadState.isNone()) {
@@ -213,12 +212,12 @@ export abstract class ModelRepository<
     return list;
   }
 
-  public getExistingList(name: string = defaultList): ModelList<ObservableModel<T>> {
+  public getExistingList(name: string = defaultList): ModelList<ObservableModel<T, ModelTypes>> {
     return this.getExistingListImpl(name);
   }
 
   public getExistingListImpl(name: string = defaultList, filter?: Partial<T>):
-    ModelListImpl<ObservableModel<T>> {
+    ModelListImpl<ObservableModel<T, ModelTypes>> {
     const existingList = this.lists.get(name);
     if (existingList) {
       return existingList;
@@ -249,13 +248,13 @@ export abstract class ModelRepository<
    * @param {string} id
    * @return {ObservableModel<T extends ModelWithId>}
    */
-  private createEmptyModel(id: string): ObservableModel<T> {
+  private createEmptyModel(id: string): ObservableModel<T, ModelTypes> {
     return observable.object({
       ...this.modelMetadata.emptyModel,
       id,
       _loadState: LoadState.none(),
       _modelType: this.modelType,
-    }) as ObservableModel<T>;
+    }) as ObservableModel<T, ModelTypes>;
   }
 
   /**
@@ -263,15 +262,15 @@ export abstract class ModelRepository<
    * @param {string} name
    * @return {ModelList<ObservableModel<T extends ModelWithId>> & IObservableObject}
    */
-  private createEmptyList(name: string, filter?: Partial<T>): ModelListImpl<ObservableModel<T>> {
-    return new ModelListImpl<ObservableModel<T>>(name, this.loadList, filter);
+  private createEmptyList(name: string, filter?: Partial<T>): ModelListImpl<ObservableModel<T, ModelTypes>> {
+    return new ModelListImpl<ObservableModel<T, ModelTypes>>(name, this.loadList, filter);
   }
 
   /**
    * This method initiate a Model loading and deserializing/denormallizing
    * @param {ObservableModel<T extends ModelWithId>} model
    */
-  private loadModel(model: ObservableModel<T>): void {
+  private loadModel(model: ObservableModel<T, ModelTypes>): void {
     if (model._loadState.isPending()) {
       return;
     }
@@ -282,7 +281,7 @@ export abstract class ModelRepository<
     if (fetchPromise) {
       fetchPromise.then((rawModel: any) => {
         this.consumeModel(model, rawModel);
-      }).catch((error: ApiError) => {
+      }).catch((error: CoreError) => {
         model._loadState = new ErrorState(error);
       });
     } else {
@@ -298,7 +297,7 @@ export abstract class ModelRepository<
           );
         }
 
-      }).catch((apiError: ApiError) => {
+      }).catch((apiError: CoreError) => {
         model._loadState = new ErrorState(apiError);
       });
     }
@@ -309,7 +308,7 @@ export abstract class ModelRepository<
    * Invalid models saved to invalidModels array of returned object
    * @param {ModelList<ObservableModel<T extends ModelWithId>> & IObservableObject} list
    */
-  private loadList = (list: ModelListImpl<ObservableModel<T>>): Promise<any> => {
+  private loadList = (list: ModelListImpl<ObservableModel<T, ModelTypes>>): Promise<any> => {
 
     if (this.fetchPromises.has(list)) {
       return this.fetchPromises.get(list) as Promise<any>; // Buggy TS
@@ -321,10 +320,10 @@ export abstract class ModelRepository<
       this.consumeModels(rawModels, list);
       this.fetchPromises.delete(list);
       return list;
-    }).catch((error: ApiError) => {
+    }).catch((error: CoreError) => {
       list.loadState = new ErrorState(error);
       this.fetchPromises.delete(list);
-      if (!(error instanceof ApiError)) {
+      if (!(error instanceof CoreError)) {
         throw error;
       }
     });
@@ -334,15 +333,15 @@ export abstract class ModelRepository<
     return fetchPromise;
   }
 
-  public consumeModels(rawModels: any[], implList?: ModelListImpl<ObservableModel<T>>) {
-    const list = implList || this.getList(defaultList, false) as ModelListImpl<ObservableModel<T>>;
+  public consumeModels(rawModels: any[], implList?: ModelListImpl<ObservableModel<T, ModelTypes>>) {
+    const list = implList || this.getList(defaultList, false) as ModelListImpl<ObservableModel<T, ModelTypes>>;
 
-    const models: ObservableModel<T>[] = [];
+    const models: ObservableModel<T, ModelTypes>[] = [];
     const invalidModels: any[] = [];
 
     for (const index in rawModels) {
       const rawModel = rawModels[index];
-      if (isObject(rawModel) && rawModel.id) {
+      if (isModelWithId(rawModel)) {
         const model = this.getExistingModel(rawModel.id);
         const normalizingError = this.mainRepository.denormalizeModel(model, rawModel, this.modelMetadata);
         if (normalizingError) {
@@ -369,8 +368,8 @@ export abstract class ModelRepository<
     list.total = models.length;
   }
 
-  public consumeModel(model: ObservableModel<T>, rawModel: any) {
-    if (isObject(rawModel) && rawModel.id) {
+  public consumeModel(model: ObservableModel<T, ModelTypes>, rawModel: any) {
+    if (isModelWithId(rawModel)) {
       const normalizingError = this.mainRepository.denormalizeModel(model, rawModel, this.modelMetadata);
       if (normalizingError) {
         this.log.debug(`Load model denormalizing error: ${normalizingError.message}`);

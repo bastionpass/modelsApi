@@ -11,12 +11,14 @@ import {
 } from './optionalTypes';
 import { ModelWithId } from 'swagger-ts-types';
 
-export interface BaseObservableOptionalModel<T extends ModelWithId> extends BaseOptionalModel<T> {
+export interface BaseObservableOptionalModel<T extends ModelWithId, ModelTypes extends string>
+    extends BaseOptionalModel<T> {
   getModelType: () => ModelTypes;
-  getMainRepository: () => MainRepository;
+  getMainRepository: () => MainRepository<ModelTypes>;
 }
 
-export function isBaseObservableOptionType(arg: any): arg is BaseObservableOptionalModel<any> {
+export function isBaseObservableOptionType<ModelType extends string>(arg: any):
+    arg is BaseObservableOptionalModel<any, ModelType> {
   return arg instanceof ObservableOptionalModel || arg instanceof ObservableOptionalModelWithOnEmpty ||
     arg instanceof ObservableOptionalModelWithOnFull || arg instanceof ObservableOptionalModelWithOnEmptyOnFull;
 }
@@ -29,14 +31,15 @@ export function isBaseObservableOptionType(arg: any): arg is BaseObservableOptio
  * optionalModel.onEmpty((model) => return <CLoader/>).onFull((model) => <CModelCard model={model}/>)
  * Because model is observable the Component will re-render when model changes (e.g. been loaded)
  */
-export class ObservableOptionalModel<T extends ModelWithId> implements OptionalModel<T>, BaseObservableOptionalModel<T>{
+export class ObservableOptionalModel<T extends ModelWithId, ModelTypes extends string> implements
+    OptionalModel<T>, BaseObservableOptionalModel<T, ModelTypes>{
 
-  constructor(protected model: ObservableModel<T | ModelWithId>,
+  constructor(protected model: ObservableModel<T | ModelWithId, ModelTypes>,
               protected modelType: ModelTypes,
-              protected mainRepository: MainRepository) {}
+              protected mainRepository: MainRepository<ModelTypes>) {}
 
   public onFull<FR>(onFullCallback: ((model: T) => FR)): OptionalModelWithOnFull<T, FR> {
-    return new ObservableOptionalModelWithOnFull<T, FR>(
+    return new ObservableOptionalModelWithOnFull<T, FR, ModelTypes>(
       this.model,
       this.modelType,
       this.mainRepository,
@@ -45,8 +48,8 @@ export class ObservableOptionalModel<T extends ModelWithId> implements OptionalM
   }
 
   public onEmpty<ER>(onEmptyCallback: (model: ModelWithId | undefined | null) => ER):
-    ObservableOptionalModelWithOnEmpty<T, ER> {
-    return new ObservableOptionalModelWithOnEmpty<T, ER>(
+    ObservableOptionalModelWithOnEmpty<T, ER, ModelTypes> {
+    return new ObservableOptionalModelWithOnEmpty<T, ER, ModelTypes>(
       this.model,
       this.modelType,
       this.mainRepository,
@@ -58,7 +61,7 @@ export class ObservableOptionalModel<T extends ModelWithId> implements OptionalM
    * This function returns model of current state: full or empty fro further manual checking
    * @return {ModelWithId | T}
    */
-  public getModel(): ObservableModel<T | ModelWithId> {
+  public getModel(): ObservableModel<T | ModelWithId, ModelTypes> {
     return this.model;
   }
 
@@ -66,21 +69,22 @@ export class ObservableOptionalModel<T extends ModelWithId> implements OptionalM
     return this.modelType;
   }
 
-  public getMainRepository(): MainRepository {
+  public getMainRepository(): MainRepository<ModelTypes> {
     return this.mainRepository;
   }
 }
 
-export class ObservableOptionalModelWithOnEmpty<T extends ModelWithId, ER> implements
-  OptionalModelWithOnEmpty<T, ER>, BaseObservableOptionalModel<T> {
+export class ObservableOptionalModelWithOnEmpty<T extends ModelWithId, ER, ModelTypes extends string> implements
+  OptionalModelWithOnEmpty<T, ER>, BaseObservableOptionalModel<T, ModelTypes> {
 
-  constructor(protected model: ObservableModel <T | ModelWithId>,
+  constructor(protected model: ObservableModel <T | ModelWithId, ModelTypes>,
               protected modelType: ModelTypes,
-              protected mainRepository: MainRepository,
+              protected mainRepository: MainRepository<ModelTypes>,
               protected onEmptyCallback: (model: ModelWithId | undefined | null) => ER) {}
 
-  public onFull<FR>(onFullCallback: ((model: T) => FR)): ObservableOptionalModelWithOnEmptyOnFull<T, ER, FR> {
-    return new ObservableOptionalModelWithOnEmptyOnFull<T, ER, FR>(
+  public onFull<FR>(onFullCallback: ((model: T) => FR)):
+      ObservableOptionalModelWithOnEmptyOnFull<T, ER, FR, ModelTypes> {
+    return new ObservableOptionalModelWithOnEmptyOnFull<T, ER, FR, ModelTypes>(
       this.model,
       this.modelType,
       this.mainRepository,
@@ -96,7 +100,7 @@ export class ObservableOptionalModelWithOnEmpty<T extends ModelWithId, ER> imple
       : this.onEmptyCallback(this.model);
   }
 
-  public getModel(): ObservableModel<T | ModelWithId> {
+  public getModel(): ObservableModel<T | ModelWithId, ModelTypes> {
     return this.model;
   }
 
@@ -104,22 +108,22 @@ export class ObservableOptionalModelWithOnEmpty<T extends ModelWithId, ER> imple
     return this.modelType;
   }
 
-  public getMainRepository(): MainRepository {
+  public getMainRepository(): MainRepository<ModelTypes> {
     return this.mainRepository;
   }
 }
 
-export class ObservableOptionalModelWithOnFull<T extends ModelWithId, FR> implements
-  OptionalModelWithOnFull<T, FR>, BaseObservableOptionalModel<T> {
+export class ObservableOptionalModelWithOnFull<T extends ModelWithId, FR, ModelTypes extends string> implements
+  OptionalModelWithOnFull<T, FR>, BaseObservableOptionalModel<T, ModelTypes> {
 
-  constructor(protected model: ObservableModel <T | ModelWithId>,
+  constructor(protected model: ObservableModel <T | ModelWithId, ModelTypes>,
               protected modelType: ModelTypes,
-              protected mainRepository: MainRepository,
+              protected mainRepository: MainRepository<ModelTypes>,
               protected onFullCallback: (model: T) => FR) {}
 
   public onEmpty<ER>(onEmptyCallback: ((model: ModelWithId | undefined | null) => ER)):
     OptionalModelWithOnEmptyOnFull<T, ER, FR> {
-    return new ObservableOptionalModelWithOnEmptyOnFull<T, ER, FR>(
+    return new ObservableOptionalModelWithOnEmptyOnFull<T, ER, FR, ModelTypes>(
       this.model,
       this.modelType,
       this.mainRepository,
@@ -130,12 +134,12 @@ export class ObservableOptionalModelWithOnFull<T extends ModelWithId, FR> implem
 
   @computed
   public get result(): FR | undefined {
-    return isFullModel<T>(this.model, this.modelType, this.mainRepository)
+    return isFullModel<T, ModelTypes>(this.model, this.modelType, this.mainRepository)
       ? this.onFullCallback(this.model)
       : void 0;
   }
 
-  public getModel(): ObservableModel<T | ModelWithId> {
+  public getModel(): ObservableModel<T | ModelWithId, ModelTypes> {
     return this.model;
   }
 
@@ -143,28 +147,28 @@ export class ObservableOptionalModelWithOnFull<T extends ModelWithId, FR> implem
     return this.modelType;
   }
 
-  public getMainRepository(): MainRepository {
+  public getMainRepository(): MainRepository<ModelTypes> {
     return this.mainRepository;
   }
 }
 
-export class ObservableOptionalModelWithOnEmptyOnFull<T extends ModelWithId, ER, FR> implements
-  OptionalModelWithOnEmptyOnFull<T, ER, FR>, BaseObservableOptionalModel<T> {
+export class ObservableOptionalModelWithOnEmptyOnFull<T extends ModelWithId, ER, FR, ModelTypes extends string> implements
+  OptionalModelWithOnEmptyOnFull<T, ER, FR>, BaseObservableOptionalModel<T, ModelTypes> {
 
-  constructor(protected model: ObservableModel <T | ModelWithId>,
+  constructor(protected model: ObservableModel <T | ModelWithId, ModelTypes>,
               protected modelType: ModelTypes,
-              protected mainRepository: MainRepository,
+              protected mainRepository: MainRepository<ModelTypes>,
               protected onEmptyCallback: (model: ModelWithId | undefined | null) => ER,
               protected onFullCallback: (model: T) => FR) {}
 
   @computed
   public get result(): ER | FR {
-    return isFullModel<T>(this.model, this.modelType, this.mainRepository)
+    return isFullModel<T, ModelTypes>(this.model, this.modelType, this.mainRepository)
       ? this.onFullCallback(this.model)
       : this.onEmptyCallback(this.model);
   }
 
-  public getModel(): ObservableModel<T | ModelWithId> {
+  public getModel(): ObservableModel<T | ModelWithId, ModelTypes> {
     return this.model;
   }
 
@@ -172,15 +176,16 @@ export class ObservableOptionalModelWithOnEmptyOnFull<T extends ModelWithId, ER,
     return this.modelType;
   }
 
-  public getMainRepository(): MainRepository {
+  public getMainRepository(): MainRepository<ModelTypes> {
     return this.mainRepository;
   }
 }
 
-function isFullModel<T extends ModelWithId>(model: T | ModelWithId,
-                                            modelType: ModelTypes,
-                                            mainRepository: MainRepository,
-                                            visitedCtx?: WeakMap<ModelWithId, boolean>): model is T {
+function isFullModel<T extends ModelWithId, ModelTypes extends string>(model: T | ModelWithId,
+                                                                       modelType: ModelTypes,
+                                                                       mainRepository: MainRepository<ModelTypes>,
+                                                                       visitedCtx?: WeakMap<ModelWithId, boolean>):
+    model is T {
 
   const visited = visitedCtx || new WeakMap<ModelWithId, boolean>();
 
