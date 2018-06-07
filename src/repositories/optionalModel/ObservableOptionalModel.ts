@@ -1,4 +1,3 @@
-import { ObservableModel } from '../modelRepository';
 import { computed } from 'mobx';
 import { ModelTypes } from '../../api/api';
 import { MainRepository } from '../mainRepository';
@@ -10,6 +9,7 @@ import {
   OptionalModelWithOnFull,
 } from './optionalTypes';
 import { ModelWithId } from 'swagger-ts-types';
+import { ObservableModel } from '../observableModel';
 
 export interface BaseObservableOptionalModel<T extends ModelWithId, ModelTypes extends string>
     extends BaseOptionalModel<T> {

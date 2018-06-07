@@ -1,16 +1,10 @@
-import { IObservableObject } from 'mobx';
-import { LoadState } from './loadState';
 import { MainRepository } from './mainRepository';
 import { ObservableOptionalModel } from './optionalModel/ObservableOptionalModel';
 import { FilteredModelListImpl, ModelList, ModelListImpl } from './modelList';
 import { CustomRepository } from './customRepository';
 import { Log } from '../log/log';
 import { ModelMetadata, ModelWithId } from 'swagger-ts-types';
-export declare type ObservableModel<T extends ModelWithId, ModelTypes extends string> = T & IObservableObject & {
-    _loadState: LoadState;
-    _modelType: ModelTypes;
-};
-export declare function isObservableModel<T extends ModelWithId, ModelTypes extends string>(arg: any): arg is ObservableModel<T, ModelTypes>;
+import { ObservableModel } from './observableModel';
 export declare abstract class ModelRepository<T extends ModelWithId, CreateRequest, UpdateRequest, ModelTypes extends string> extends CustomRepository<ModelTypes> {
     protected isModel: (arg: any) => boolean;
     protected log: Log;

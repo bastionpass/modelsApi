@@ -1,4 +1,4 @@
-import { ModelRepository, ObservableModel } from '../modelRepository';
+import { ModelRepository } from '../modelRepository';
 import { MainRepository } from '../mainRepository';
 import { DoneState, ErrorState, LoadState } from '../loadState';
 import { autorun, isObservable } from 'mobx';
@@ -8,6 +8,7 @@ import { ObservableOptionalModel } from '../optionalModel/ObservableOptionalMode
 import { Log, LogLevel } from '../../log/log';
 import { initializeInject, InjectionMap } from '../../inject/inject';
 import { isObject, ModelMetadata, ModelWithId } from 'swagger-ts-types';
+import { ObservableModel } from '../observableModel';
 
 const modelType = 'ModelType';
 

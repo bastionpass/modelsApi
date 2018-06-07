@@ -1,5 +1,5 @@
-import { ObservableModel } from '../modelRepository';
 import { ModelWithId } from 'swagger-ts-types';
+import { ObservableModel } from '../observableModel';
 export interface BaseOptionalModel<T extends ModelWithId> {
     getModel: () => T | ModelWithId | undefined | null;
 }

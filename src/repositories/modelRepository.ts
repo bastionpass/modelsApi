@@ -8,17 +8,16 @@ import { FilteredModelListImpl, ModelList, ModelListImpl } from './modelList';
 import { CustomRepository } from './customRepository';
 import { inject } from '../inject/inject';
 import { Log } from '../log/log';
-import {isModelWithId, isNewModel, isObject, ModelMetadata, ModelWithId, newModelId, serialize} from 'swagger-ts-types';
-
-export type ObservableModel<T extends ModelWithId, ModelTypes extends string> = T & IObservableObject & {
-  _loadState: LoadState;
-  _modelType: ModelTypes;
-};
-
-export function isObservableModel<T extends ModelWithId, ModelTypes extends string>(arg: any):
-    arg is ObservableModel<T, ModelTypes> {
-  return isObject(arg) && arg._loadState instanceof LoadState && arg._modelType;
-}
+import {
+  isModelWithId,
+  isNewModel,
+  isObject,
+  ModelMetadata,
+  ModelWithId,
+  newModelId,
+  serialize,
+} from 'swagger-ts-types';
+import { ObservableModel } from './observableModel';
 
 const defaultList = 'all';
 

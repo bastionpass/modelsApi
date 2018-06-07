@@ -16,7 +16,8 @@ export { LoadState, ErrorState, DoneState, PendingState, NoneState } from './rep
 export { isUnknownModelTypeError, UnknownModelTypeError } from './repositories/unknownModelTypeError';
 export { MainRepository, ModelRepositoriesMap } from './repositories/mainRepository';
 export { ModelList, ModelListImpl, FilteredModelListImpl } from './repositories/modelList';
-export { ModelRepository, ObservableModel } from './repositories/modelRepository';
+export { ModelRepository } from './repositories/modelRepository';
+export { ObservableModel, isObservableModel } from './repositories/observableModel';
 export { CustomRepository } from './repositories/customRepository';
 export {
   OptionalModel,

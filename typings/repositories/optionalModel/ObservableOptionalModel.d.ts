@@ -1,7 +1,7 @@
-import { ObservableModel } from '../modelRepository';
 import { MainRepository } from '../mainRepository';
 import { BaseOptionalModel, OptionalModel, OptionalModelWithOnEmpty, OptionalModelWithOnEmptyOnFull, OptionalModelWithOnFull } from './optionalTypes';
 import { ModelWithId } from 'swagger-ts-types';
+import { ObservableModel } from '../observableModel';
 export interface BaseObservableOptionalModel<T extends ModelWithId, ModelTypes extends string> extends BaseOptionalModel<T> {
     getModelType: () => ModelTypes;
     getMainRepository: () => MainRepository<ModelTypes>;

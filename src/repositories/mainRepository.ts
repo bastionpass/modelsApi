@@ -1,9 +1,10 @@
-import { ModelRepository, ObservableModel } from './modelRepository';
+import { ModelRepository } from './modelRepository';
 import { set } from 'mobx';
 import { ObservableOptionalModel } from './optionalModel/ObservableOptionalModel';
 import { isUnknownModelTypeError, UnknownModelTypeError } from './unknownModelTypeError';
-import {BaseModel, Deserializer, ModelMetadata, ModelWithId} from 'swagger-ts-types';
+import { Deserializer, ModelMetadata, ModelWithId } from 'swagger-ts-types';
 import { CoreError } from '../coreError';
+import { ObservableModel } from './observableModel';
 
 export type ModelRepositoriesMap<ModelTypes extends string> =
     Map<ModelTypes, ModelRepository<any, any, any, ModelTypes>>;
@@ -26,7 +27,9 @@ export class MainRepository<ModelTypes extends string> {
   public getModel<T extends ModelWithId> (modelType: ModelTypes, id: string)
     : ObservableOptionalModel<T, ModelTypes> | UnknownModelTypeError {
     const result = this.getRawModel<T>(modelType, id);
-    return isUnknownModelTypeError(result) ? result : new ObservableOptionalModel<T, ModelTypes>(result, modelType, this);
+    return isUnknownModelTypeError(result)
+      ? result
+      : new ObservableOptionalModel<T, ModelTypes>(result, modelType, this);
   }
 
   /**
