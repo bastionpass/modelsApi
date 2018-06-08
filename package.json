@@ -22,6 +22,15 @@
     "url": "https://github.com/apz77/modelsApi/issues"
   },
   "homepage": "https://github.com/apz77/modelsApi#readme",
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ]
+  }
+}
+
+/*
   "devDependencies": {
     "@types/jest": "^22.2.3",
     "tslint": "^5.9.1",
@@ -33,12 +42,5 @@
     "swagger-ts-types": "git+https://github.com/apz77/swagger-ts-types.git",
     "jest": "22.4.3"
   },
-  "dependencies": {
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ]
-  }
-}
+
+*/
