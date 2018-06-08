@@ -6,14 +6,14 @@ import {
   OptionalModelWithOnEmpty,
   OptionalModelWithOnEmptyOnFull,
   OptionalModelWithOnFull,
-  MainRepository,
+  IMainRepository,
 } from '../../internals';
 import { ModelWithId } from 'swagger-ts-types';
 
 export interface BaseObservableOptionalModel<T extends ModelWithId, ModelTypes extends string>
     extends BaseOptionalModel<T> {
   getModelType: () => ModelTypes;
-  getMainRepository: () => MainRepository<ModelTypes>;
+  getMainRepository: () => IMainRepository<ModelTypes>;
 }
 
 export function isBaseObservableOptionType<ModelType extends string>(arg: any):
@@ -35,7 +35,7 @@ export class ObservableOptionalModel<T extends ModelWithId, ModelTypes extends s
 
   constructor(protected model: ObservableModel<T | ModelWithId, ModelTypes>,
               protected modelType: ModelTypes,
-              protected mainRepository: MainRepository<ModelTypes>) {}
+              protected mainRepository: IMainRepository<ModelTypes>) {}
 
   public onFull<FR>(onFullCallback: ((model: T) => FR)): OptionalModelWithOnFull<T, FR> {
     return new ObservableOptionalModelWithOnFull<T, FR, ModelTypes>(
@@ -68,7 +68,7 @@ export class ObservableOptionalModel<T extends ModelWithId, ModelTypes extends s
     return this.modelType;
   }
 
-  public getMainRepository(): MainRepository<ModelTypes> {
+  public getMainRepository(): IMainRepository<ModelTypes> {
     return this.mainRepository;
   }
 }
@@ -78,7 +78,7 @@ export class ObservableOptionalModelWithOnEmpty<T extends ModelWithId, ER, Model
 
   constructor(protected model: ObservableModel <T | ModelWithId, ModelTypes>,
               protected modelType: ModelTypes,
-              protected mainRepository: MainRepository<ModelTypes>,
+              protected mainRepository: IMainRepository<ModelTypes>,
               protected onEmptyCallback: (model: ModelWithId | undefined | null) => ER) {}
 
   public onFull<FR>(onFullCallback: ((model: T) => FR)):
@@ -107,7 +107,7 @@ export class ObservableOptionalModelWithOnEmpty<T extends ModelWithId, ER, Model
     return this.modelType;
   }
 
-  public getMainRepository(): MainRepository<ModelTypes> {
+  public getMainRepository(): IMainRepository<ModelTypes> {
     return this.mainRepository;
   }
 }
@@ -117,7 +117,7 @@ export class ObservableOptionalModelWithOnFull<T extends ModelWithId, FR, ModelT
 
   constructor(protected model: ObservableModel <T | ModelWithId, ModelTypes>,
               protected modelType: ModelTypes,
-              protected mainRepository: MainRepository<ModelTypes>,
+              protected mainRepository: IMainRepository<ModelTypes>,
               protected onFullCallback: (model: T) => FR) {}
 
   public onEmpty<ER>(onEmptyCallback: ((model: ModelWithId | undefined | null) => ER)):
@@ -146,7 +146,7 @@ export class ObservableOptionalModelWithOnFull<T extends ModelWithId, FR, ModelT
     return this.modelType;
   }
 
-  public getMainRepository(): MainRepository<ModelTypes> {
+  public getMainRepository(): IMainRepository<ModelTypes> {
     return this.mainRepository;
   }
 }
@@ -156,7 +156,7 @@ export class ObservableOptionalModelWithOnEmptyOnFull<T extends ModelWithId, ER,
 
   constructor(protected model: ObservableModel <T | ModelWithId, ModelTypes>,
               protected modelType: ModelTypes,
-              protected mainRepository: MainRepository<ModelTypes>,
+              protected mainRepository: IMainRepository<ModelTypes>,
               protected onEmptyCallback: (model: ModelWithId | undefined | null) => ER,
               protected onFullCallback: (model: T) => FR) {}
 
@@ -175,14 +175,14 @@ export class ObservableOptionalModelWithOnEmptyOnFull<T extends ModelWithId, ER,
     return this.modelType;
   }
 
-  public getMainRepository(): MainRepository<ModelTypes> {
+  public getMainRepository(): IMainRepository<ModelTypes> {
     return this.mainRepository;
   }
 }
 
 function isFullModel<T extends ModelWithId, ModelTypes extends string>(model: T | ModelWithId,
                                                                        modelType: ModelTypes,
-                                                                       mainRepository: MainRepository<ModelTypes>,
+                                                                       mainRepository: IMainRepository<ModelTypes>,
                                                                        visitedCtx?: WeakMap<ModelWithId, boolean>):
     model is T {
 

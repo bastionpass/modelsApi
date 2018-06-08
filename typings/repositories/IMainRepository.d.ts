@@ -1,9 +1,7 @@
-import { ObservableModel, ObservableOptionalModel, UnknownModelTypeError, CoreError, ModelRepository } from '../internals';
 import { ModelMetadata, ModelWithId } from 'swagger-ts-types';
-import { IMainRepository } from './IMainRepository';
-export declare type ModelRepositoriesMap<ModelTypes extends string> = Map<ModelTypes, ModelRepository<any, any, any, ModelTypes>>;
-export declare class MainRepository<ModelTypes extends string> implements IMainRepository<ModelTypes> {
-    private modelRepositories;
+import { CoreError, ModelRepository, ObservableModel, UnknownModelTypeError } from '../internals';
+import { ObservableOptionalModel } from './optionalModel/ObservableOptionalModel';
+export interface IMainRepository<ModelTypes extends string> {
     getModelRepository<R extends ModelRepository<any, any, any, ModelTypes>>(modelType: ModelTypes): R | undefined;
     /**
      * Entry point to get Model to work with, also, could be used particular repository getModel function
@@ -21,7 +19,7 @@ export declare class MainRepository<ModelTypes extends string> implements IMainR
     getRawModel<T extends ModelWithId>(modelType: string, id: string): ObservableModel<T | ModelWithId, ModelTypes> | UnknownModelTypeError;
     isFullModel<T extends ModelWithId>(model: T | ModelWithId, modelType: ModelTypes): model is T;
     getMetadata(modelType: ModelTypes): ModelMetadata | UnknownModelTypeError;
-    isKnownModelType: (arg: any) => arg is ModelTypes;
+    isKnownModelType(arg: any): arg is ModelTypes;
     /**
      * Denormalize, deserialize, and validate raw model, received from backend
      * Replaces links with real Models, and deserialize primitive types

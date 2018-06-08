@@ -6,7 +6,7 @@ import {
   CoreError,
   ObservableOptionalModel,
   ObservableModel,
-  MainRepository,
+  IMainRepository,
   FilteredModelListImpl,
   ModelList,
   ModelListImpl,
@@ -50,7 +50,7 @@ export abstract class ModelRepository<
   constructor(modelType: ModelTypes,
               modelMetadata: ModelMetadata,
               protected isModel: (arg: any) => boolean,
-              mainRepository: MainRepository<ModelTypes>) {
+              mainRepository: IMainRepository<ModelTypes>) {
     super(mainRepository);
     mainRepository.registerModelRepository(modelType, this);
     this.modelType = modelType;

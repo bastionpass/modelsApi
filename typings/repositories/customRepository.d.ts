@@ -1,5 +1,5 @@
-import { MainRepository } from '../internals';
+import { IMainRepository } from '../internals';
 export declare abstract class CustomRepository<ModelTypes extends string> {
-    protected mainRepository: MainRepository<ModelTypes>;
-    constructor(mainRepository: MainRepository<ModelTypes>);
+    protected mainRepository: IMainRepository<ModelTypes>;
+    constructor(mainRepository: IMainRepository<ModelTypes>);
 }

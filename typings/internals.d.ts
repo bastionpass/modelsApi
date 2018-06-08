@@ -7,6 +7,7 @@ export * from './log/log';
 export * from './repositories/loadState';
 export * from './repositories/unknownModelTypeError';
 export * from './repositories/mainRepository';
+export * from './repositories/IMainRepository';
 export * from './repositories/modelList';
 export * from './repositories/modelRepository';
 export * from './repositories/customRepository';

@@ -8,13 +8,14 @@ import {
   ModelRepository,
 } from '../internals';
 import { Deserializer, ModelMetadata, ModelWithId } from 'swagger-ts-types';
+import { IMainRepository } from './IMainRepository';
 import autobind from 'autobind-decorator';
 
 export type ModelRepositoriesMap<ModelTypes extends string> =
     Map<ModelTypes, ModelRepository<any, any, any, ModelTypes>>;
 
 @autobind
-export class MainRepository<ModelTypes extends string> {
+export class MainRepository<ModelTypes extends string> implements IMainRepository<ModelTypes> {
 
   private modelRepositories: ModelRepositoriesMap<ModelTypes> = new Map();
 

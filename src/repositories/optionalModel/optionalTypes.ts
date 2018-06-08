@@ -7,6 +7,7 @@ import {
   getInjected,
   isObservableModel,
   ObservableModel,
+  IMainRepository,
   MainRepository,
 } from '../../internals';
 import { ModelWithId } from 'swagger-ts-types';
@@ -46,7 +47,7 @@ export module OptionalModel {
           src.getMainRepository(),
       );
     } else if (isObservableModel(src)) {
-      const mainRepository = getInjected<MainRepository<ModelType>>(defaultInjectNamespace, MainRepository);
+      const mainRepository = getInjected<IMainRepository<ModelType>>(defaultInjectNamespace, MainRepository);
       return new ObservableOptionalModel<TT, ModelType>(src, src._modelType, mainRepository);
     } else if (isBaseStaticOptionalModel(src)) {
       return new StaticOptionalModel(src.getModel());

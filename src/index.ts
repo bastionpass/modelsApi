@@ -24,6 +24,7 @@ export {
   isUnknownModelTypeError,
   UnknownModelTypeError,
   MainRepository,
+  IMainRepository,
   ModelRepositoriesMap,
   ModelList,
   ModelListImpl,
