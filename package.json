@@ -27,15 +27,14 @@
     "tslint": "^5.9.1",
     "tslint-config-airbnb": "^5.8.0",
     "typescript": "^2.7.2",
-    "jest": "22.4.3"
-  },
-  "dependencies": {
+    "jest": "22.4.3",
     "@types/autobind-decorator": "^2.1.0",
     "@types/react": "^16.3.16",
     "autobind-decorator": "^2.1.0",
     "mobx": "^4.3.1",
-    "react": "^16.4.0",
     "swagger-ts-types": "git+https://github.com/apz77/swagger-ts-types.git"
+  },
+  "dependencies": {
   },
   "jest": {
     "moduleFileExtensions": [
