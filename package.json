@@ -22,6 +22,10 @@
     "url": "https://github.com/apz77/modelsApi/issues"
   },
   "homepage": "https://github.com/apz77/modelsApi#readme",
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
   "jest": {
     "moduleFileExtensions": [
       "ts",
