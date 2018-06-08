@@ -4,7 +4,7 @@ import {
   OptionalModelWithOnFull,
   OptionalModelWithOnEmptyOnFull,
   OptionalModelWithOnEmpty, BaseOptionalModel,
-} from './optionalTypes';
+} from '../../internals';
 import { ModelWithId, isObject } from 'swagger-ts-types';
 
 type BaseStaticOptionalModel<T extends ModelWithId> = BaseOptionalModel<T>;

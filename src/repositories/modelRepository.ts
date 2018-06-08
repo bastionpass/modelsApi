@@ -1,13 +1,19 @@
 import { IObservableObject, observable, set } from 'mobx';
 import { ObservableValue } from 'mobx/lib/types/observablevalue';
-import { ErrorState, LoadState } from './loadState';
-import { MainRepository } from './mainRepository';
-import { CoreError } from '../coreError';
-import { ObservableOptionalModel } from './optionalModel/ObservableOptionalModel';
-import { FilteredModelListImpl, ModelList, ModelListImpl } from './modelList';
-import { CustomRepository } from './customRepository';
-import { inject } from '../inject/inject';
-import { Log } from '../log/log';
+import {
+  ErrorState,
+  LoadState,
+  CoreError,
+  ObservableOptionalModel,
+  ObservableModel,
+  MainRepository,
+  FilteredModelListImpl,
+  ModelList,
+  ModelListImpl,
+  CustomRepository,
+  inject,
+  Log,
+} from '../internals';
 import {
   isModelWithId,
   isNewModel,
@@ -17,7 +23,6 @@ import {
   newModelId,
   serialize,
 } from 'swagger-ts-types';
-import { ObservableModel } from './observableModel';
 
 const defaultList = 'all';
 

@@ -1,11 +1,8 @@
-import { ModelRepository } from './modelRepository';
-import { ObservableOptionalModel } from './optionalModel/ObservableOptionalModel';
-import { UnknownModelTypeError } from './unknownModelTypeError';
+import { ObservableModel, ObservableOptionalModel, UnknownModelTypeError, CoreError, ModelRepository } from '../internals';
 import { ModelMetadata, ModelWithId } from 'swagger-ts-types';
-import { CoreError } from '../coreError';
 export declare type ModelRepositoriesMap<ModelTypes extends string> = Map<ModelTypes, ModelRepository<any, any, any, ModelTypes>>;
 export declare class MainRepository<ModelTypes extends string> {
-    modelRepositories: ModelRepositoriesMap<ModelTypes>;
+    private modelRepositories;
     getModelRepository<R extends ModelRepository<any, any, any, ModelTypes>>(modelType: ModelTypes): R | undefined;
     /**
      * Entry point to get Model to work with, also, could be used particular repository getModel function
@@ -20,13 +17,7 @@ export declare class MainRepository<ModelTypes extends string> {
      * @param {string} id
      * @return {ObservableModel<ModelWithId | T> | UnknownModelTypeError}
      */
-    getRawModel: <T extends ModelWithId>(modelType: string, id: string) => UnknownModelTypeError | (ModelWithId & import("../../node_modules/mobx/lib/types/observableobject").IObservableObject & {
-        _loadState: import("./loadState").LoadState;
-        _modelType: ModelTypes;
-    }) | (T & import("../../node_modules/mobx/lib/types/observableobject").IObservableObject & {
-        _loadState: import("./loadState").LoadState;
-        _modelType: ModelTypes;
-    });
+    getRawModel<T extends ModelWithId>(modelType: string, id: string): ObservableModel<T | ModelWithId, ModelTypes> | UnknownModelTypeError;
     isFullModel<T extends ModelWithId>(model: T | ModelWithId, modelType: ModelTypes): model is T;
     getMetadata(modelType: ModelTypes): ModelMetadata | UnknownModelTypeError;
     isKnownModelType: (arg: any) => arg is ModelTypes;
@@ -36,9 +27,6 @@ export declare class MainRepository<ModelTypes extends string> {
      * @param {ModelWithId} rawModel
      * @param {ModelMetadata} metadata
      */
-    denormalizeModel: (model: ModelWithId & import("../../node_modules/mobx/lib/types/observableobject").IObservableObject & {
-        _loadState: import("./loadState").LoadState;
-        _modelType: ModelTypes;
-    }, rawModel: ModelWithId, metadata: ModelMetadata) => CoreError | null;
+    denormalizeModel(model: ObservableModel<ModelWithId, ModelTypes>, rawModel: ModelWithId, metadata: ModelMetadata): CoreError | null;
     registerModelRepository(modelType: ModelTypes, modelRepository: ModelRepository<any, any, any, ModelTypes>): void;
 }

@@ -1,4 +1,4 @@
-import { CoreError } from '../coreError';
+import { CoreError } from '../internals';
 /**
  * LoadState describes state of Model or List of models, whether it's being loaded from backend or
  */

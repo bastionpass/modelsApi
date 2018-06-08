@@ -1,4 +1,4 @@
-import { OptionalModel, OptionalModelWithOnFull, OptionalModelWithOnEmptyOnFull, OptionalModelWithOnEmpty, BaseOptionalModel } from './optionalTypes';
+import { OptionalModel, OptionalModelWithOnFull, OptionalModelWithOnEmptyOnFull, OptionalModelWithOnEmpty, BaseOptionalModel } from '../../internals';
 import { ModelWithId } from 'swagger-ts-types';
 declare type BaseStaticOptionalModel<T extends ModelWithId> = BaseOptionalModel<T>;
 export declare function isBaseStaticOptionalModel(arg: any): arg is BaseStaticOptionalModel<any>;

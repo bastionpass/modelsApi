@@ -1,4 +1,4 @@
-import { LoadState } from './loadState';
+import { LoadState } from '../internals';
 import { ModelWithId } from 'swagger-ts-types';
 export interface ModelList<T extends ModelWithId> {
     readonly name: string;

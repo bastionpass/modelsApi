@@ -1,6 +1,6 @@
-import { LoadState } from './loadState';
+import { LoadState } from '../internals';
 import { isObject, ModelWithId } from 'swagger-ts-types';
-import { IObservableObject } from 'mobx';
+import { IObservableObject } from 'mobx/lib/types/observableobject';
 
 export type ObservableModel<T extends ModelWithId, ModelTypes extends string> = T & IObservableObject & {
   _loadState: LoadState;

@@ -1,9 +1,15 @@
-import { isBaseStaticOptionalModel, StaticOptionalModel } from './staticOptionalModel';
-import { isBaseObservableOptionType, ObservableOptionalModel } from './ObservableOptionalModel';
-import { defaultInjectNamespace, getInjected } from '../../inject/inject';
-import { MainRepository } from '../mainRepository';
+import {
+  isBaseStaticOptionalModel,
+  StaticOptionalModel,
+  isBaseObservableOptionType,
+  ObservableOptionalModel,
+  defaultInjectNamespace,
+  getInjected,
+  isObservableModel,
+  ObservableModel,
+  MainRepository,
+} from '../../internals';
 import { ModelWithId } from 'swagger-ts-types';
-import { isObservableModel, ObservableModel } from '../observableModel';
 
 export interface BaseOptionalModel<T extends ModelWithId> {
   getModel: () => T | ModelWithId | undefined | null;

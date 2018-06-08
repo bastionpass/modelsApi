@@ -1,4 +1,4 @@
-import { LoadState } from './loadState';
+import { LoadState } from '../internals';
 import { computed, observable } from 'mobx';
 import { ModelWithId, isModelWithId } from 'swagger-ts-types';
 

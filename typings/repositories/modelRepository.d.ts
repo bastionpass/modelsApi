@@ -1,10 +1,5 @@
-import { MainRepository } from './mainRepository';
-import { ObservableOptionalModel } from './optionalModel/ObservableOptionalModel';
-import { FilteredModelListImpl, ModelList, ModelListImpl } from './modelList';
-import { CustomRepository } from './customRepository';
-import { Log } from '../log/log';
+import { ObservableOptionalModel, ObservableModel, MainRepository, FilteredModelListImpl, ModelList, ModelListImpl, CustomRepository, Log } from '../internals';
 import { ModelMetadata, ModelWithId } from 'swagger-ts-types';
-import { ObservableModel } from './observableModel';
 export declare abstract class ModelRepository<T extends ModelWithId, CreateRequest, UpdateRequest, ModelTypes extends string> extends CustomRepository<ModelTypes> {
     protected isModel: (arg: any) => boolean;
     protected log: Log;

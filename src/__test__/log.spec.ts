@@ -1,5 +1,4 @@
-import { DELETE_BUNCH, Log, LogLevel, MAX_JOURNAL_LENGTH } from '../log/log';
-import { CoreError } from '../coreError';
+import { DELETE_BUNCH, Log, LogLevel, MAX_JOURNAL_LENGTH, CoreError } from '../internals';
 
 describe('Log service test', () => {
 

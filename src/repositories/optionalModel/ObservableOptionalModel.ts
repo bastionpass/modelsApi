@@ -1,15 +1,14 @@
 import { computed } from 'mobx';
-import { ModelTypes } from '../../api/api';
-import { MainRepository } from '../mainRepository';
 import {
   BaseOptionalModel,
+  ObservableModel,
   OptionalModel,
   OptionalModelWithOnEmpty,
   OptionalModelWithOnEmptyOnFull,
   OptionalModelWithOnFull,
-} from './optionalTypes';
+  MainRepository,
+} from '../../internals';
 import { ModelWithId } from 'swagger-ts-types';
-import { ObservableModel } from '../observableModel';
 
 export interface BaseObservableOptionalModel<T extends ModelWithId, ModelTypes extends string>
     extends BaseOptionalModel<T> {

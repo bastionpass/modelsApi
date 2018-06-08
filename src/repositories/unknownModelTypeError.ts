@@ -1,4 +1,4 @@
-import { CoreError } from '../coreError';
+import { CoreError } from '../internals';
 
 export class UnknownModelTypeError extends CoreError {
   constructor(private modelType: string) {

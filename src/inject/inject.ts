@@ -1,9 +1,7 @@
 import * as React from 'react';
 import 'reflect-metadata';
-import { CoreError } from '../coreError';
-import isObject = require('lodash/fp/isObject');
-import isString = require('lodash/fp/isString');
-import { bindArgs } from '../utils/bindFunc';
+import { CoreError, bindArgs } from '../internals';
+import { isObject, isString } from 'swagger-ts-types';
 
 /**
  * Decorator (or decorator factory, if the first parameter is a string)

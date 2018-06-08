@@ -1,14 +1,22 @@
-import { ModelRepository } from '../modelRepository';
-import { MainRepository } from '../mainRepository';
-import { DoneState, ErrorState, LoadState } from '../loadState';
+import {
+  ModelRepository ,
+  MainRepository,
+  DoneState,
+  ErrorState,
+  LoadState,
+  isUnknownModelTypeError,
+  ModelList,
+  ModelListImpl,
+  ObservableOptionalModel,
+  Log,
+  LogLevel,
+  initializeInject,
+  InjectionMap,
+  ObservableModel
+} from '../../internals';
+
 import { autorun, isObservable } from 'mobx';
-import { isUnknownModelTypeError } from '../unknownModelTypeError';
-import { ModelList, ModelListImpl } from '../modelList';
-import { ObservableOptionalModel } from '../optionalModel/ObservableOptionalModel';
-import { Log, LogLevel } from '../../log/log';
-import { initializeInject, InjectionMap } from '../../inject/inject';
 import { isObject, ModelMetadata, ModelWithId } from 'swagger-ts-types';
-import { ObservableModel } from '../observableModel';
 
 const modelType = 'ModelType';
 

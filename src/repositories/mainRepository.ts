@@ -1,21 +1,26 @@
-import { ModelRepository } from './modelRepository';
 import { set } from 'mobx';
-import { ObservableOptionalModel } from './optionalModel/ObservableOptionalModel';
-import { isUnknownModelTypeError, UnknownModelTypeError } from './unknownModelTypeError';
+import {
+  ObservableModel,
+  ObservableOptionalModel,
+  isUnknownModelTypeError,
+  UnknownModelTypeError,
+  CoreError,
+  ModelRepository,
+} from '../internals';
 import { Deserializer, ModelMetadata, ModelWithId } from 'swagger-ts-types';
-import { CoreError } from '../coreError';
-import { ObservableModel } from './observableModel';
+import autobind from 'autobind-decorator';
 
 export type ModelRepositoriesMap<ModelTypes extends string> =
     Map<ModelTypes, ModelRepository<any, any, any, ModelTypes>>;
 
+@autobind
 export class MainRepository<ModelTypes extends string> {
 
-  public modelRepositories: ModelRepositoriesMap<ModelTypes> = new Map();
+  private modelRepositories: ModelRepositoriesMap<ModelTypes> = new Map();
 
   public getModelRepository<R extends ModelRepository<any, any, any, ModelTypes>>(modelType: ModelTypes):
       R | undefined {
-    return this.modelRepositories.get(modelType) as R;
+    return this.modelRepositories.get(modelType) as R | undefined;
   }
 
   /**
@@ -38,8 +43,8 @@ export class MainRepository<ModelTypes extends string> {
    * @param {string} id
    * @return {ObservableModel<ModelWithId | T> | UnknownModelTypeError}
    */
-  public getRawModel = <T extends ModelWithId>(modelType: string, id: string)
-    : ObservableModel<T | ModelWithId, ModelTypes> | UnknownModelTypeError => {
+  public getRawModel<T extends ModelWithId>(modelType: string, id: string)
+    : ObservableModel<T | ModelWithId, ModelTypes> | UnknownModelTypeError {
 
     const modelRepository = this.modelRepositories.get(modelType as ModelTypes);
     if (modelRepository) {
@@ -72,9 +77,9 @@ export class MainRepository<ModelTypes extends string> {
    * @param {ModelWithId} rawModel
    * @param {ModelMetadata} metadata
    */
-  public denormalizeModel = (model: ObservableModel<ModelWithId, ModelTypes>,
-                             rawModel: ModelWithId,
-                             metadata: ModelMetadata): CoreError | null => {
+  public denormalizeModel(model: ObservableModel<ModelWithId, ModelTypes>,
+                          rawModel: ModelWithId,
+                          metadata: ModelMetadata): CoreError | null {
 
     const denormalizeResult = Deserializer.denormalizeRawModel(
       rawModel,
