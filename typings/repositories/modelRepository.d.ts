@@ -17,13 +17,13 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @param {string} id
      * @return {ObservableValue<T extends ModelWithId>}
      */
-    getModel(id: string): ObservableOptionalModel<T, ModelTypes>;
+    getModel(id: string, load?: boolean): ObservableOptionalModel<T, ModelTypes>;
     /**
      * If you need raw ObservableModel<Model> without OptionalModel Wrapper,
      * @param {string} id
      * @return {ObservableModel<ModelWithId | T>}
      */
-    getRawModel(id: string, autoLoad?: boolean): ObservableModel<T | ModelWithId, ModelTypes>;
+    getRawModel(id: string, load?: boolean): ObservableModel<T | ModelWithId, ModelTypes>;
     isFullModel(model: any): model is T;
     getMetadata(): ModelMetadata;
     /**

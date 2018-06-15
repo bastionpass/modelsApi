@@ -22,11 +22,19 @@
     "url": "https://github.com/apz77/modelsApi/issues"
   },
   "homepage": "https://github.com/apz77/modelsApi#readme",
-  "dependencies": {},
+  "dependencies": {
+    "autobind-decorator": "^2.1.0",
+    "swagger-ts-types": "git+https://github.com/apz77/swagger-ts-types.git"
+  },
   "devDependencies": {
     "tslint": "^5.9.1",
     "tslint-config-airbnb": "^5.8.0",
-    "typescript": "^2.7.2"
+    "typescript": "^2.7.2",
+    "jest": "22.4.3",
+    "react": "16.3.1",
+    "mobx": "^4.3.1",
+    "@types/jest": "^22.2.3",
+    "@types/react": "^16.3.13"
   },
   "jest": {
     "moduleFileExtensions": [

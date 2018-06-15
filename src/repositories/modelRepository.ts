@@ -65,8 +65,8 @@ export abstract class ModelRepository<
    * @param {string} id
    * @return {ObservableValue<T extends ModelWithId>}
    */
-  public getModel(id: string): ObservableOptionalModel<T, ModelTypes> {
-    return new ObservableOptionalModel(this.getRawModel(id), this.modelType, this.mainRepository);
+  public getModel(id: string, load?: boolean): ObservableOptionalModel<T, ModelTypes> {
+    return new ObservableOptionalModel(this.getRawModel(id, load), this.modelType, this.mainRepository);
   }
 
   /**
@@ -74,10 +74,10 @@ export abstract class ModelRepository<
    * @param {string} id
    * @return {ObservableModel<ModelWithId | T>}
    */
-  public getRawModel(id: string, autoLoad: boolean = true): ObservableModel<T | ModelWithId, ModelTypes> {
+  public getRawModel(id: string, load?: boolean): ObservableModel<T | ModelWithId, ModelTypes> {
     // Try to get existing model
     const model = this.getExistingModel(id);
-    if (autoLoad && model._loadState.isNone()) {
+    if (load || (load === void 0 && model._loadState.isNone())) {
       setImmediate(() => this.loadModel(model));
     }
     return model;
