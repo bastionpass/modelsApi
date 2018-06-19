@@ -108,15 +108,12 @@ function propertyDecorator(target: any, propertyName: string) {
 
   Object.defineProperty(target, propertyName, {
     get() {
-      if (!target.injectionNamespace) {
-        throw new CoreError(`Please decorate a class with @inject before decorating a property` +
-          ` or a ctor parameter ${target.constructor.name}`);
-      }
-      if (!(injections[target.injectionNamespace] instanceof InjectionMap)) {
+      const injectionNamespace = target.injectionNamespace || defaultInjectNamespace;
+      if (!(injections[injectionNamespace] instanceof InjectionMap)) {
         throw new CoreError(`Please, initialize injections with initializeInject()` +
-          ` for ${target.injectionNamespace} namespace. ${target.constructor.name}`);
+          ` for ${injectionNamespace} namespace. ${target.constructor.name}`);
       }
-      return injections[target.injectionNamespace].get(injectionConstructor);
+      return injections[injectionNamespace].get(injectionConstructor);
     },
   });
 }
@@ -127,16 +124,17 @@ function propertyDecorator(target: any, propertyName: string) {
  * @param {WithConstructor<T>} injectionConstructor
  * @return {T}
  */
-export function getInjected<T>(namespaceOrObject: string | Object, injectionConstructor: WithConstructor<T>): T {
+export function getInjected<T>(namespaceOrObject: string | Object | null | undefined, injectionConstructor: WithConstructor<T>): T {
   let injectionNamespace: string;
 
   if (isObject(namespaceOrObject)) {
     if (!(namespaceOrObject as any).injectionNamespace) {
-      throw new CoreError(`Cannot determine namespace for ${namespaceOrObject.constructor.name}.`);
+      injectionNamespace = defaultInjectNamespace;
+    } else {
+      injectionNamespace = (namespaceOrObject as any).injectionNamespace;
     }
-    injectionNamespace = (namespaceOrObject as any).injectionNamespace;
   } else {
-    injectionNamespace = String(namespaceOrObject);
+    injectionNamespace = namespaceOrObject ? String(namespaceOrObject) : defaultInjectNamespace;
   }
 
   if (!(injections[injectionNamespace] instanceof InjectionMap)) {

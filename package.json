@@ -24,6 +24,7 @@
   "homepage": "https://github.com/apz77/modelsApi#readme",
   "dependencies": {
     "autobind-decorator": "^2.1.0",
+    "reflect-metadata": "^0.1.12",
     "swagger-ts-types": "git+https://github.com/apz77/swagger-ts-types.git"
   },
   "devDependencies": {

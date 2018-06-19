@@ -42,7 +42,7 @@ export declare function initializeInject(injectionMap: InjectionMap, namespace?:
  * @param {WithConstructor<T>} injectionConstructor
  * @return {T}
  */
-export declare function getInjected<T>(namespaceOrObject: string | Object, injectionConstructor: WithConstructor<T>): T;
+export declare function getInjected<T>(namespaceOrObject: string | Object | null | undefined, injectionConstructor: WithConstructor<T>): T;
 /**
  * Creating a new injection instance with resolving all @inject decorated dependencies till the very bottom
  * @param {WithConstructor<any>} injectionConstructor
