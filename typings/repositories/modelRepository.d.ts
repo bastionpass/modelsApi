@@ -27,6 +27,15 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
     isFullModel(model: any): model is T;
     getMetadata(): ModelMetadata;
     /**
+     * Returns true if model with particular id exists in repo
+     * Note, that does not mean the model really exists on backend.
+     * This method will return true, if before getModel, getRawModel, or getExistingModel was called
+     * Use this method to not pollute repository with models with unknown id
+     * @param {string} id
+     * @return {boolean}
+     */
+    hasModel(id: string): boolean;
+    /**
      * Use this method to create and later save a new model
      * @return {ObservableModel<T extends ModelWithId>}
      */
