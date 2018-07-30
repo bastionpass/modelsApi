@@ -371,7 +371,7 @@ export abstract class ModelRepository<
           model._loadState = new ErrorState(normalizingError);
         } else {
           // Avoid gaps in lists for now
-          const resultingIndex = (index as any as number) + startIndex;
+          const resultingIndex = Number(index) + startIndex;
           if (models.length < resultingIndex) {
             models[resultingIndex] = model;
           } else {
