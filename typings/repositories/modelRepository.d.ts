@@ -81,7 +81,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @return {Promise<any> | null}
      */
     protected abstract fetchModel(id: string): Promise<any> | null;
-    protected abstract fetchList(name: string, consume: (models: any[]) => void): Promise<any[]>;
+    protected abstract fetchList(name: string, consume?: (models: any[]) => void): Promise<any[]>;
     protected abstract create(saveModel: CreateRequest): Promise<any>;
     protected abstract update(saveModel: UpdateRequest): Promise<any>;
     protected abstract deleteOne(model: T): Promise<any>;
