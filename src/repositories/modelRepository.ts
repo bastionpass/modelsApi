@@ -334,7 +334,7 @@ export abstract class ModelRepository<
     list.loadState = LoadState.pending();
 
     const intermediateConsume = (rawModels: any[], startingIndex: number) => {
-      this.consumeModels(rawModels, list, startingIndex);
+      this.pushModelsToList(rawModels, list, startingIndex);
     };
 
     const fetchPromise = this.fetchList(list.name, intermediateConsume).then((rawModels: any[]) => {
@@ -354,9 +354,26 @@ export abstract class ModelRepository<
     return fetchPromise;
   }
 
-  public consumeModels(rawModels: any[], implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex: number = 0) {
+  public consumeModels(rawModels: any[],
+                       implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex: number = 0) {
+
     const list = implList || this.getList(defaultList, false) as ModelListImpl<ObservableModel<T, ModelTypes>>;
 
+    this.pushModelsToList(rawModels, list, startIndex);
+
+    list.loadState = list.invalidModels.length
+      ? new ErrorState(
+        new CoreError(`${list.invalidModels.length} invalid models came from backed. ${JSON.stringify(rawModels)}`),
+      )
+      : LoadState.done();
+
+    list.total = list.models.length;
+  }
+
+  protected pushModelsToList(rawModels: any[],
+                             implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex: number = 0) {
+
+    const list = implList || this.getList(defaultList, false) as ModelListImpl<ObservableModel<T, ModelTypes>>;
     const models = list.models;
     const invalidModels = list.invalidModels;
 
@@ -383,14 +400,6 @@ export abstract class ModelRepository<
         invalidModels.push(rawModel);
       }
     }
-
-    list.loadState = invalidModels.length
-      ? new ErrorState(
-        new CoreError(`${invalidModels.length} invalid models came from backed. ${JSON.stringify(rawModels)}`),
-      )
-      : LoadState.done();
-
-    list.total = models.length;
   }
 
   public consumeModel(model: ObservableModel<T, ModelTypes>, rawModel: any) {

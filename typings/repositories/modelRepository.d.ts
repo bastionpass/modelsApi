@@ -109,6 +109,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      */
     private loadList;
     consumeModels(rawModels: any[], implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex?: number): void;
+    protected pushModelsToList(rawModels: any[], implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex?: number): void;
     consumeModel(model: ObservableModel<T, ModelTypes>, rawModel: any): void;
     getModelType(): ModelTypes;
     getMainRepository(): IMainRepository<ModelTypes>;
