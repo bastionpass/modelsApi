@@ -255,7 +255,7 @@ export abstract class ModelRepository<
    */
   protected abstract fetchModel(id: string): Promise<any> | null;
 
-  protected abstract fetchList(name: string, consume: (models: any[]) => void): Promise<any[]>;
+  protected abstract fetchList(name: string, consume: (models: any[], startIndex: number) => void): Promise<any[]>;
   protected abstract create(saveModel: CreateRequest): Promise<any>;
   protected abstract update(saveModel: UpdateRequest): Promise<any>;
   protected abstract deleteOne(model: T): Promise<any>;
@@ -333,8 +333,8 @@ export abstract class ModelRepository<
 
     list.loadState = LoadState.pending();
 
-    const intermediateConsume = (rawModels: any[]) => {
-      this.consumeModels(rawModels, list);
+    const intermediateConsume = (rawModels: any[], startingIndex: number) => {
+      this.consumeModels(rawModels, list, startingIndex);
     };
 
     const fetchPromise = this.fetchList(list.name, intermediateConsume).then((rawModels: any[]) => {
@@ -354,11 +354,11 @@ export abstract class ModelRepository<
     return fetchPromise;
   }
 
-  public consumeModels(rawModels: any[], implList?: ModelListImpl<ObservableModel<T, ModelTypes>>) {
+  public consumeModels(rawModels: any[], implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex: number = 0) {
     const list = implList || this.getList(defaultList, false) as ModelListImpl<ObservableModel<T, ModelTypes>>;
 
-    const models: ObservableModel<T, ModelTypes>[] = [];
-    const invalidModels: any[] = [];
+    const models = list.models;
+    const invalidModels = list.invalidModels;
 
     for (const index in rawModels) {
       const rawModel = rawModels[index];
@@ -370,7 +370,13 @@ export abstract class ModelRepository<
           invalidModels.push(rawModel);
           model._loadState = new ErrorState(normalizingError);
         } else {
-          models.push(model);
+          // Avoid gaps in lists for now
+          const resultingIndex = (index as any as number) + startIndex;
+          if (models.length < resultingIndex) {
+            models[resultingIndex] = model;
+          } else {
+            models.push(model);
+          }
           model._loadState = LoadState.done();
         }
       } else {
@@ -384,8 +390,6 @@ export abstract class ModelRepository<
       )
       : LoadState.done();
 
-    list.models = observable.array(models);
-    list.invalidModels = observable.array(invalidModels);
     list.total = models.length;
   }
 

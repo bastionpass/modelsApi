@@ -81,7 +81,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @return {Promise<any> | null}
      */
     protected abstract fetchModel(id: string): Promise<any> | null;
-    protected abstract fetchList(name: string, consume: (models: any[]) => void): Promise<any[]>;
+    protected abstract fetchList(name: string, consume: (models: any[], startIndex: number) => void): Promise<any[]>;
     protected abstract create(saveModel: CreateRequest): Promise<any>;
     protected abstract update(saveModel: UpdateRequest): Promise<any>;
     protected abstract deleteOne(model: T): Promise<any>;
@@ -108,7 +108,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @param {ModelList<ObservableModel<T extends ModelWithId>> & IObservableObject} list
      */
     private loadList;
-    consumeModels(rawModels: any[], implList?: ModelListImpl<ObservableModel<T, ModelTypes>>): void;
+    consumeModels(rawModels: any[], implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex?: number): void;
     consumeModel(model: ObservableModel<T, ModelTypes>, rawModel: any): void;
     getModelType(): ModelTypes;
     getMainRepository(): IMainRepository<ModelTypes>;
