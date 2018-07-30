@@ -2,13 +2,14 @@ import { ObservableOptionalModel, ObservableModel, IMainRepository, FilteredMode
 import { ModelMetadata, ModelWithId } from 'swagger-ts-types';
 export declare abstract class ModelRepository<T extends ModelWithId, CreateRequest, UpdateRequest, ModelTypes extends string> extends CustomRepository<ModelTypes> {
     protected isModel: (arg: any) => boolean;
+    private asyncListProcess;
     protected log: Log;
     protected modelType: ModelTypes;
     protected modelMetadata: ModelMetadata;
     protected allModels: Map<string, ObservableModel<T, ModelTypes>>;
     protected lists: Map<string, ModelListImpl<ObservableModel<T, ModelTypes>>>;
     private fetchPromises;
-    constructor(modelType: ModelTypes, modelMetadata: ModelMetadata, isModel: (arg: any) => boolean, mainRepository: IMainRepository<ModelTypes>);
+    constructor(modelType: ModelTypes, modelMetadata: ModelMetadata, isModel: (arg: any) => boolean, mainRepository: IMainRepository<ModelTypes>, asyncListProcess?: number);
     /**
      * The main entry point of obtain a model. It returns existing model, or try to load it via API
      * the method immediately returns observable T model with appropriate loadsState
@@ -80,7 +81,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @return {Promise<any> | null}
      */
     protected abstract fetchModel(id: string): Promise<any> | null;
-    protected abstract fetchList(name: string): Promise<any[]>;
+    protected abstract fetchList(name: string, consume: (models: any[]) => void): Promise<any[]>;
     protected abstract create(saveModel: CreateRequest): Promise<any>;
     protected abstract update(saveModel: UpdateRequest): Promise<any>;
     protected abstract deleteOne(model: T): Promise<any>;

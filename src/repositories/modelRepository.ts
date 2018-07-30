@@ -50,7 +50,8 @@ export abstract class ModelRepository<
   constructor(modelType: ModelTypes,
               modelMetadata: ModelMetadata,
               protected isModel: (arg: any) => boolean,
-              mainRepository: IMainRepository<ModelTypes>) {
+              mainRepository: IMainRepository<ModelTypes>,
+              private asyncListProcess: number = 10) {
     super(mainRepository);
     mainRepository.registerModelRepository(modelType, this);
     this.modelType = modelType;
@@ -254,7 +255,7 @@ export abstract class ModelRepository<
    */
   protected abstract fetchModel(id: string): Promise<any> | null;
 
-  protected abstract fetchList(name: string): Promise<any[]>;
+  protected abstract fetchList(name: string, consume: (models: any[]) => void): Promise<any[]>;
   protected abstract create(saveModel: CreateRequest): Promise<any>;
   protected abstract update(saveModel: UpdateRequest): Promise<any>;
   protected abstract deleteOne(model: T): Promise<any>;
@@ -332,7 +333,11 @@ export abstract class ModelRepository<
 
     list.loadState = LoadState.pending();
 
-    const fetchPromise = this.fetchList(list.name).then((rawModels: any[]) => {
+    const intermediateConsume = (rawModels: any[]) => {
+      this.consumeModels(rawModels, list);
+    };
+
+    const fetchPromise = this.fetchList(list.name, intermediateConsume).then((rawModels: any[]) => {
       this.consumeModels(rawModels, list);
       this.fetchPromises.delete(list);
       return list;
