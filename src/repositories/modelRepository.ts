@@ -402,7 +402,7 @@ export abstract class ModelRepository<
     }
   }
 
-  public consumeModel(model: ObservableModel<T, ModelTypes>, rawModel: any) {
+  public consumeModel(model: ObservableModel<T | ModelWithId, ModelTypes>, rawModel: any) {
     if (isModelWithId(rawModel)) {
       const normalizingError = this.mainRepository.denormalizeModel(model, rawModel, this.modelMetadata);
       if (normalizingError) {
