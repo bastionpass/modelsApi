@@ -374,8 +374,6 @@ export abstract class ModelRepository<
                              implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex: number = 0) {
 
     const list = implList || this.getList(defaultList, false) as ModelListImpl<ObservableModel<T, ModelTypes>>;
-    const models = list.models;
-    const invalidModels = list.invalidModels;
 
     for (const index in rawModels) {
       const rawModel = rawModels[index];
@@ -384,20 +382,20 @@ export abstract class ModelRepository<
         const normalizingError = this.mainRepository.denormalizeModel(model, rawModel, this.modelMetadata);
         if (normalizingError) {
           this.log.debug(`Denormalization error: ${normalizingError.message}`);
-          invalidModels.push(rawModel);
+          list.invalidModels.push(rawModel);
           model._loadState = new ErrorState(normalizingError);
         } else {
           // Avoid gaps in lists for now
           const resultingIndex = Number(index) + startIndex;
-          if (models.length < resultingIndex) {
-            models[resultingIndex] = model;
+          if (list.models.length > resultingIndex) {
+            list.models[resultingIndex] = model;
           } else {
-            models.push(model);
+            list.models.push(model);
           }
           model._loadState = LoadState.done();
         }
       } else {
-        invalidModels.push(rawModel);
+        list.invalidModels.push(rawModel);
       }
     }
   }
