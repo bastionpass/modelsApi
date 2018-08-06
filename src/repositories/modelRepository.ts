@@ -127,7 +127,12 @@ export abstract class ModelRepository<
       apiPromise = this.create(saveModel as CreateRequest)
         .then((responseModel) => {
           // Push new model to default list
-          this.pushModelsToList([responseModel], this.getExistingListImpl());
+          this.consumeModel(model, responseModel);
+          if (!model._loadState.isError()) {
+            const defaultList = this.getExistingListImpl();
+            defaultList.models.unshift(model as any);
+            defaultList.total += 1;
+          }
         });
     } else {
       apiPromise = this.update(saveModel as UpdateRequest)
