@@ -119,7 +119,7 @@ export abstract class ModelRepository<
    * @param saveModel
    * @return {Promise<void>}
    */
-  public createOrUpdate(model: ObservableModel<T, ModelTypes>, saveModel: CreateRequest | UpdateRequest) {
+  public createOrUpdate(model: ObservableModel<T | ModelWithId, ModelTypes>, saveModel: CreateRequest | UpdateRequest) {
     let apiPromise: Promise<any>;
 
     // TODO: add type checking for saveModel and isNewModel
