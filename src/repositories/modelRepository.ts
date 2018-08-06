@@ -124,27 +124,28 @@ export abstract class ModelRepository<
 
     // TODO: add type checking for saveModel and isNewModel
     if (isNewModel(model)) {
-      apiPromise = this.create(saveModel as CreateRequest);
+      apiPromise = this.create(saveModel as CreateRequest)
+        .then((responseModel) => {
+          // Push new model to default list
+          this.pushModelsToList([responseModel], this.getExistingListImpl());
+        });
     } else {
-      apiPromise = this.update(saveModel as UpdateRequest);
+      apiPromise = this.update(saveModel as UpdateRequest)
+        .then((responseModel) => {
+          // This model could be already created in repo, in that case we have to copy
+          const existingModel = this.allModels.get(responseModel.id);
+          if (existingModel) {
+            if (existingModel !== model) {
+              set(existingModel, model);
+            }
+            this.consumeModel(model, responseModel);
+          } else {
+            this.pushModelsToList([responseModel], this.getExistingListImpl());
+          }
+        });
     }
 
-    return apiPromise.then((responseModel) => {
-
-      this.consumeModel(model, responseModel);
-
-      // This model could be already created in repo, in that case we have to copy
-      // This is very rare case, when, for instance fresh model arrived via websocket
-      const existingModel = this.allModels.get(responseModel.id);
-      if (existingModel) {
-        if (existingModel !== model) {
-          set(existingModel, model);
-        }
-      } else {
-        this.allModels.set(model.id, model);
-      }
-
-    }).catch((error: CoreError) => {
+    return apiPromise.catch((error: CoreError) => {
       model._loadState = new ErrorState(error);
       throw error;
     });
