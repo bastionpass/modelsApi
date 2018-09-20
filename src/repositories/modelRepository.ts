@@ -156,14 +156,14 @@ export abstract class ModelRepository<
     });
   }
 
-  public deleteModel(model: T): void {
+  public deleteModel(model: T): Promise<void> {
     const realModel = this.allModels.get(model.id);
 
     if (realModel) {
       realModel._loadState = LoadState.pending();
     }
 
-    this.deleteOne(model).then(() => {
+    return this.deleteOne(model).then(() => {
       if (realModel) {
         realModel._loadState = LoadState.done();
         this.allModels.delete(model.id);
