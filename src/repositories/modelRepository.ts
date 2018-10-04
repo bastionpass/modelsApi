@@ -128,6 +128,7 @@ export abstract class ModelRepository<
         .then((responseModel) => {
           // Push new model to default list
           this.consumeModel(model, responseModel);
+          this.allModels.set(model.id, model as ObservableModel<T, ModelTypes>);
           if (!model._loadState.isError()) {
             const defaultList = this.getExistingListImpl();
             defaultList.models.unshift(model as any);
