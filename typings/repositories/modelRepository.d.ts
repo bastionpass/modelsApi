@@ -107,7 +107,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * Invalid models saved to invalidModels array of returned object
      * @param {ModelList<ObservableModel<T extends ModelWithId>> & IObservableObject} list
      */
-    private loadList;
+    protected loadList: (list: ModelListImpl<ObservableModel<T, ModelTypes>>) => Promise<any>;
     consumeModels(rawModels: any[], implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex?: number): void;
     protected pushModelsToList(rawModels: any[], implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex?: number): void;
     consumeModel(model: ObservableModel<T | ModelWithId, ModelTypes>, rawModel: any): void;
