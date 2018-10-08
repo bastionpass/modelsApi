@@ -1,4 +1,4 @@
-import { IObservableObject, observable, set } from 'mobx';
+import { action, IObservableObject, observable, set} from 'mobx';
 import { ObservableValue } from 'mobx/lib/types/observablevalue';
 import {
   ErrorState,
@@ -361,6 +361,7 @@ export abstract class ModelRepository<
     return fetchPromise;
   }
 
+  @action
   public consumeModels(rawModels: any[],
                        implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex: number = 0) {
 
@@ -407,6 +408,7 @@ export abstract class ModelRepository<
     }
   }
 
+  @action
   public consumeModel(model: ObservableModel<T | ModelWithId, ModelTypes>, rawModel: any) {
     if (isModelWithId(rawModel)) {
       const normalizingError = this.mainRepository.denormalizeModel(model, rawModel, this.modelMetadata);
