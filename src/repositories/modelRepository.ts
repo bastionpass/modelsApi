@@ -45,7 +45,7 @@ export abstract class ModelRepository<
   @observable.shallow
   protected lists: Map<string, ModelListImpl<ObservableModel<T, ModelTypes>>> = new Map();
 
-  private fetchPromises: Map<Object, Promise<any>> = new Map();
+  protected fetchPromises: Map<Object, Promise<any>> = new Map();
 
   constructor(modelType: ModelTypes,
               modelMetadata: ModelMetadata,

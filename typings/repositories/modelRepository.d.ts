@@ -8,7 +8,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
     protected modelMetadata: ModelMetadata;
     protected allModels: Map<string, ObservableModel<T, ModelTypes>>;
     protected lists: Map<string, ModelListImpl<ObservableModel<T, ModelTypes>>>;
-    private fetchPromises;
+    protected fetchPromises: Map<Object, Promise<any>>;
     constructor(modelType: ModelTypes, modelMetadata: ModelMetadata, isModel: (arg: any) => boolean, mainRepository: IMainRepository<ModelTypes>, asyncListProcess?: number);
     /**
      * The main entry point of obtain a model. It returns existing model, or try to load it via API
