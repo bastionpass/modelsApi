@@ -332,7 +332,7 @@ export abstract class ModelRepository<
    * Invalid models saved to invalidModels array of returned object
    * @param {ModelList<ObservableModel<T extends ModelWithId>> & IObservableObject} list
    */
-  private loadList = (list: ModelListImpl<ObservableModel<T, ModelTypes>>): Promise<any> => {
+  protected loadList = (list: ModelListImpl<ObservableModel<T, ModelTypes>>): Promise<any> => {
 
     if (this.fetchPromises.has(list)) {
       return this.fetchPromises.get(list) as Promise<any>; // Buggy TS
