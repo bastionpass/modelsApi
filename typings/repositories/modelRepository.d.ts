@@ -108,9 +108,22 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @param {ModelList<ObservableModel<T extends ModelWithId>> & IObservableObject} list
      */
     private loadList;
+    /**
+     * This method consumes an array of models and replaces them in a given list starting from provided index
+     * It does not pushes models into allList, thou it updates models, tha could be in other lists as well.
+     * @param {any[]} rawModels
+     * @param {ModelListImpl<ObservableModel<T extends ModelWithId, ModelTypes extends string>>} implList
+     * @param {number} startIndex
+     */
     consumeModels(rawModels: any[], implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex?: number): void;
     protected pushModelsToList(rawModels: any[], implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex?: number): void;
-    consumeModel(model: ObservableModel<T | ModelWithId, ModelTypes>, rawModel: any): void;
+    /**
+     * This function is used to consume raw model into a repository
+     * If needed this function unshifts a model into global list.
+     * @param rawModel - the model to be consumed
+     * @param {ObservableModel<ModelWithId | T, ModelTypes extends string>} model - optional model to fill in
+     */
+    consumeModel(rawModel: any, model?: ObservableModel<T | ModelWithId, ModelTypes>): ObservableModel<T, ModelTypes>;
     getModelType(): ModelTypes;
     getMainRepository(): IMainRepository<ModelTypes>;
 }

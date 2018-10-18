@@ -127,27 +127,12 @@ export abstract class ModelRepository<
       apiPromise = this.create(saveModel as CreateRequest)
         .then((responseModel) => {
           // Push new model to default list
-          this.consumeModel(model, responseModel);
-          this.allModels.set(model.id, model as ObservableModel<T, ModelTypes>);
-          if (!model._loadState.isError()) {
-            const defaultList = this.getExistingListImpl();
-            defaultList.models.unshift(model as any);
-            defaultList.total += 1;
-          }
+          this.consumeModel(responseModel, model);
         });
     } else {
       apiPromise = this.update(saveModel as UpdateRequest)
         .then((responseModel) => {
-          // This model could be already created in repo, in that case we have to copy
-          const existingModel = this.allModels.get(responseModel.id);
-          if (existingModel) {
-            if (existingModel !== model) {
-              set(existingModel, model);
-            }
-            this.consumeModel(model, responseModel);
-          } else {
-            this.pushModelsToList([responseModel], this.getExistingListImpl());
-          }
+          this.consumeModel(model, responseModel);
         });
     }
 
@@ -304,7 +289,7 @@ export abstract class ModelRepository<
     const fetchPromise = this.fetchModel(model.id);
     if (fetchPromise) {
       fetchPromise.then((rawModel: any) => {
-        this.consumeModel(model, rawModel);
+        this.consumeModel(rawModel, model);
       }).catch((error: CoreError) => {
         model._loadState = new ErrorState(error);
       });
@@ -361,6 +346,13 @@ export abstract class ModelRepository<
     return fetchPromise;
   }
 
+  /**
+   * This method consumes an array of models and replaces them in a given list starting from provided index
+   * It does not pushes models into allList, thou it updates models, tha could be in other lists as well.
+   * @param {any[]} rawModels
+   * @param {ModelListImpl<ObservableModel<T extends ModelWithId, ModelTypes extends string>>} implList
+   * @param {number} startIndex
+   */
   public consumeModels(rawModels: any[],
                        implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex: number = 0) {
 
@@ -407,20 +399,38 @@ export abstract class ModelRepository<
     }
   }
 
-  public consumeModel(model: ObservableModel<T | ModelWithId, ModelTypes>, rawModel: any) {
+  /**
+   * This function is used to consume raw model into a repository
+   * If needed this function unshifts a model into global list.
+   * @param rawModel - the model to be consumed
+   * @param {ObservableModel<ModelWithId | T, ModelTypes extends string>} model - optional model to fill in
+   */
+  public consumeModel(rawModel: any, model?: ObservableModel<T | ModelWithId, ModelTypes>): ObservableModel<T, ModelTypes> {
+
+    const workingModel = model || this.getExistingModel(rawModel.id);
+
     if (isModelWithId(rawModel)) {
-      const normalizingError = this.mainRepository.denormalizeModel(model, rawModel, this.modelMetadata);
+
+      const normalizingError = this.mainRepository.denormalizeModel(workingModel, rawModel, this.modelMetadata);
       if (normalizingError) {
         this.log.debug(`Load model denormalizing error: ${normalizingError.message}`);
-        model._loadState = new ErrorState(normalizingError);
+        workingModel._loadState = new ErrorState(normalizingError);
       } else {
-        model._loadState = LoadState.done();
+        workingModel._loadState = LoadState.done();
+        const allList = this.getExistingListImpl();
+        if (allList.models.indexOf(workingModel as ObservableModel<T, ModelTypes>) < 0) {
+          allList.models.unshift(workingModel as ObservableModel<T, ModelTypes>);
+          allList.total += 1;
+        }
       }
+
     } else {
-      model._loadState = new ErrorState(
+      workingModel._loadState = new ErrorState(
         new CoreError(`Denormalizing error: model has no id ${JSON.stringify(rawModel)}`),
       );
     }
+
+    return workingModel as ObservableModel<T, ModelTypes>;
   }
 
   public getModelType() {
