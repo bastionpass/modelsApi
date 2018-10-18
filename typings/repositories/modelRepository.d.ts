@@ -8,7 +8,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
     protected modelMetadata: ModelMetadata;
     protected allModels: Map<string, ObservableModel<T, ModelTypes>>;
     protected lists: Map<string, ModelListImpl<ObservableModel<T, ModelTypes>>>;
-    private fetchPromises;
+    protected fetchPromises: Map<Object, Promise<any>>;
     constructor(modelType: ModelTypes, modelMetadata: ModelMetadata, isModel: (arg: any) => boolean, mainRepository: IMainRepository<ModelTypes>, asyncListProcess?: number);
     /**
      * The main entry point of obtain a model. It returns existing model, or try to load it via API
@@ -90,24 +90,24 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @param {string} id
      * @return {ObservableModel<T extends ModelWithId>}
      */
-    private createEmptyModel;
+    protected createEmptyModel(id: string): ObservableModel<T, ModelTypes>;
     /**
      * Inner helper that creates empty model list
      * @param {string} name
      * @return {ModelList<ObservableModel<T extends ModelWithId>> & IObservableObject}
      */
-    private createEmptyList;
+    protected createEmptyList(name: string, filter?: Partial<T>): ModelListImpl<ObservableModel<T, ModelTypes>>;
     /**
      * This method initiate a Model loading and deserializing/denormallizing
      * @param {ObservableModel<T extends ModelWithId>} model
      */
-    private loadModel;
+    protected loadModel(model: ObservableModel<T, ModelTypes>): void;
     /**
      * This method initiate List loading and deserializing/denormallizing of all loaded models
      * Invalid models saved to invalidModels array of returned object
      * @param {ModelList<ObservableModel<T extends ModelWithId>> & IObservableObject} list
      */
-    private loadList;
+    protected loadList: (list: ModelListImpl<ObservableModel<T, ModelTypes>>) => Promise<any>;
     /**
      * This method consumes an array of models and replaces them in a given list starting from provided index
      * It does not pushes models into allList, thou it updates models, tha could be in other lists as well.

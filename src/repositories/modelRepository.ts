@@ -1,4 +1,4 @@
-import { IObservableObject, observable, set } from 'mobx';
+import { action, IObservableObject, observable, set} from 'mobx';
 import { ObservableValue } from 'mobx/lib/types/observablevalue';
 import {
   ErrorState,
@@ -45,7 +45,7 @@ export abstract class ModelRepository<
   @observable.shallow
   protected lists: Map<string, ModelListImpl<ObservableModel<T, ModelTypes>>> = new Map();
 
-  private fetchPromises: Map<Object, Promise<any>> = new Map();
+  protected fetchPromises: Map<Object, Promise<any>> = new Map();
 
   constructor(modelType: ModelTypes,
               modelMetadata: ModelMetadata,
@@ -257,7 +257,7 @@ export abstract class ModelRepository<
    * @param {string} id
    * @return {ObservableModel<T extends ModelWithId>}
    */
-  private createEmptyModel(id: string): ObservableModel<T, ModelTypes> {
+  protected createEmptyModel(id: string): ObservableModel<T, ModelTypes> {
     return observable.object({
       ...this.modelMetadata.emptyModel,
       id,
@@ -271,7 +271,7 @@ export abstract class ModelRepository<
    * @param {string} name
    * @return {ModelList<ObservableModel<T extends ModelWithId>> & IObservableObject}
    */
-  private createEmptyList(name: string, filter?: Partial<T>): ModelListImpl<ObservableModel<T, ModelTypes>> {
+  protected createEmptyList(name: string, filter?: Partial<T>): ModelListImpl<ObservableModel<T, ModelTypes>> {
     return new ModelListImpl<ObservableModel<T, ModelTypes>>(name, this.loadList, filter);
   }
 
@@ -279,7 +279,7 @@ export abstract class ModelRepository<
    * This method initiate a Model loading and deserializing/denormallizing
    * @param {ObservableModel<T extends ModelWithId>} model
    */
-  private loadModel(model: ObservableModel<T, ModelTypes>): void {
+  protected loadModel(model: ObservableModel<T, ModelTypes>): void {
     if (model._loadState.isPending()) {
       return;
     }
@@ -317,7 +317,7 @@ export abstract class ModelRepository<
    * Invalid models saved to invalidModels array of returned object
    * @param {ModelList<ObservableModel<T extends ModelWithId>> & IObservableObject} list
    */
-  private loadList = (list: ModelListImpl<ObservableModel<T, ModelTypes>>): Promise<any> => {
+  protected loadList = (list: ModelListImpl<ObservableModel<T, ModelTypes>>): Promise<any> => {
 
     if (this.fetchPromises.has(list)) {
       return this.fetchPromises.get(list) as Promise<any>; // Buggy TS
