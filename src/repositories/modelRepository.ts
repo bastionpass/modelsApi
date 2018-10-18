@@ -132,7 +132,7 @@ export abstract class ModelRepository<
     } else {
       apiPromise = this.update(saveModel as UpdateRequest)
         .then((responseModel) => {
-          this.consumeModel(model, responseModel);
+          this.consumeModel(responseModel, model);
         });
     }
 
