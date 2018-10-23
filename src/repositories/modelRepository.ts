@@ -40,7 +40,7 @@ export abstract class ModelRepository<
   protected modelMetadata: ModelMetadata;
 
   @observable.shallow
-  protected allModels: Map<string, ObservableModel<T, ModelTypes>> = new Map();
+  protected allModels: Map<string, ObservableModel<T | ModelWithId, ModelTypes>> = new Map();
 
   @observable.shallow
   protected lists: Map<string, ModelListImpl<ObservableModel<T, ModelTypes>>> = new Map();
@@ -133,6 +133,7 @@ export abstract class ModelRepository<
       apiPromise = this.update(saveModel as UpdateRequest)
         .then((responseModel) => {
           this.consumeModel(responseModel, model);
+          this.allModels.set(model.id, model);
         });
     }
 
@@ -168,7 +169,7 @@ export abstract class ModelRepository<
     });
   }
 
-  public getExistingModel(id: string): ObservableModel<T, ModelTypes> {
+  public getExistingModel(id: string): ObservableModel<T | ModelWithId, ModelTypes> {
     const existingModel = this.allModels.get(id);
 
     if (existingModel) {
@@ -279,7 +280,7 @@ export abstract class ModelRepository<
    * This method initiate a Model loading and deserializing/denormallizing
    * @param {ObservableModel<T extends ModelWithId>} model
    */
-  protected loadModel(model: ObservableModel<T, ModelTypes>): void {
+  protected loadModel(model: ObservableModel<T | ModelWithId, ModelTypes>): void {
     if (model._loadState.isPending()) {
       return;
     }

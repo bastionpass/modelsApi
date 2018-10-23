@@ -4,7 +4,7 @@ export interface ModelList<T extends ModelWithId> {
     readonly name: string;
     readonly loadState: LoadState;
     readonly total: number;
-    readonly models: T[];
+    readonly models: (T | ModelWithId)[];
     readonly invalidModels: any[];
     readonly loadList: () => Promise<any>;
     readonly filter?: {
@@ -15,7 +15,7 @@ export declare class ModelListImpl<T extends ModelWithId> implements ModelList<T
     name: string;
     loadState: LoadState;
     total: number;
-    models: T[];
+    models: (T | ModelWithId)[];
     invalidModels: any[];
     readonly filter: Partial<T> | undefined;
     private $filter?;
@@ -28,7 +28,7 @@ export declare class FilteredModelListImpl<T extends ModelWithId> implements Mod
     private $originalList;
     readonly loadState: LoadState;
     readonly total: number;
-    readonly models: T[];
+    readonly models: (T | ModelWithId)[];
     invalidModels: any[];
     readonly filter: Partial<T>;
     private $filter;

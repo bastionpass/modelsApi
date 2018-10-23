@@ -1,4 +1,5 @@
-import { ObservableOptionalModel, ObservableModel, IMainRepository, FilteredModelListImpl, ModelList, ModelListImpl, CustomRepository, Log } from '../internals';
+import { IObservableObject } from 'mobx';
+import { LoadState, ObservableOptionalModel, ObservableModel, IMainRepository, FilteredModelListImpl, ModelList, ModelListImpl, CustomRepository, Log } from '../internals';
 import { ModelMetadata, ModelWithId } from 'swagger-ts-types';
 export declare abstract class ModelRepository<T extends ModelWithId, CreateRequest, UpdateRequest, ModelTypes extends string> extends CustomRepository<ModelTypes> {
     protected isModel: (arg: any) => boolean;
@@ -6,7 +7,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
     protected log: Log;
     protected modelType: ModelTypes;
     protected modelMetadata: ModelMetadata;
-    protected allModels: Map<string, ObservableModel<T, ModelTypes>>;
+    protected allModels: Map<string, ObservableModel<T | ModelWithId, ModelTypes>>;
     protected lists: Map<string, ModelListImpl<ObservableModel<T, ModelTypes>>>;
     protected fetchPromises: Map<Object, Promise<any>>;
     constructor(modelType: ModelTypes, modelMetadata: ModelMetadata, isModel: (arg: any) => boolean, mainRepository: IMainRepository<ModelTypes>, asyncListProcess?: number);
@@ -50,7 +51,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      */
     createOrUpdate(model: ObservableModel<T | ModelWithId, ModelTypes>, saveModel: CreateRequest | UpdateRequest): Promise<any>;
     deleteModel(model: T): Promise<void>;
-    getExistingModel(id: string): ObservableModel<T, ModelTypes>;
+    getExistingModel(id: string): ObservableModel<T | ModelWithId, ModelTypes>;
     /**
      * The main entry point to get list of Models. The method immediately return observable list
      * and if it was not loaded or is not being loaded, starts it's async loading. The returned observable list will
@@ -101,13 +102,16 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * This method initiate a Model loading and deserializing/denormallizing
      * @param {ObservableModel<T extends ModelWithId>} model
      */
-    protected loadModel(model: ObservableModel<T, ModelTypes>): void;
+    protected loadModel(model: ObservableModel<T | ModelWithId, ModelTypes>): void;
     /**
      * This method initiate List loading and deserializing/denormallizing of all loaded models
      * Invalid models saved to invalidModels array of returned object
      * @param {ModelList<ObservableModel<T extends ModelWithId>> & IObservableObject} list
      */
-    protected loadList: (list: ModelListImpl<ObservableModel<T, ModelTypes>>) => Promise<any>;
+    protected loadList: (list: ModelListImpl<T & IObservableObject & {
+        _loadState: LoadState;
+        _modelType: ModelTypes;
+    }>) => Promise<any>;
     /**
      * This method consumes an array of models and replaces them in a given list starting from provided index
      * It does not pushes models into allList, thou it updates models, tha could be in other lists as well.

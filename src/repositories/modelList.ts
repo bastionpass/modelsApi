@@ -6,7 +6,7 @@ export interface ModelList<T extends ModelWithId> {
   readonly name: string;
   readonly loadState: LoadState; // Load state of the List
   readonly total: number;        // Total number of items
-  readonly models: T[];          // valid loaded models
+  readonly models: (T | ModelWithId)[];          // valid loaded models
   readonly invalidModels: any[]; // invalid loaded models
   readonly loadList: () => Promise<any>;  // Load current list
   readonly filter?: {[key in keyof T]?: T[key]};
@@ -21,7 +21,7 @@ export class ModelListImpl<T extends ModelWithId> implements ModelList<T> {
   public total: number = 0;
 
   @observable.shallow
-  public models: T[] = [];
+  public models: (T | ModelWithId)[] = [];
 
   @observable.shallow
   public invalidModels: any[] = [];
@@ -63,7 +63,7 @@ export class FilteredModelListImpl<T extends ModelWithId> implements ModelList<T
   }
 
   @computed
-  public get models(): T[] {
+  public get models(): (T | ModelWithId)[] {
     const filter = this.filter;
     return this.$originalList.models.filter((model) => {
       for (const key in filter) {
