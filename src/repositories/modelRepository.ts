@@ -40,7 +40,7 @@ export abstract class ModelRepository<
   protected modelMetadata: ModelMetadata;
 
   @observable.shallow
-  protected allModels: Map<string, ObservableModel<T | ModelWithId, ModelTypes>> = new Map();
+  protected allModels: Map<string, ObservableModel<T, ModelTypes>> = new Map();
 
   @observable.shallow
   protected lists: Map<string, ModelListImpl<ObservableModel<T, ModelTypes>>> = new Map();
@@ -75,7 +75,7 @@ export abstract class ModelRepository<
    * @param {string} id
    * @return {ObservableModel<ModelWithId | T>}
    */
-  public getRawModel(id: string, load?: boolean): ObservableModel<T | ModelWithId, ModelTypes> {
+  public getRawModel(id: string, load?: boolean): ObservableModel<T, ModelTypes> {
     // Try to get existing model
     const model = this.getExistingModel(id);
     if (load || (load === void 0 && model._loadState.isNone())) {
@@ -108,7 +108,7 @@ export abstract class ModelRepository<
    * Use this method to create and later save a new model
    * @return {ObservableModel<T extends ModelWithId>}
    */
-  public createNewModel(): ObservableModel<T | ModelWithId, ModelTypes> {
+  public createNewModel(): ObservableModel<T, ModelTypes> {
     return this.createEmptyModel(newModelId);
   }
 
@@ -119,7 +119,7 @@ export abstract class ModelRepository<
    * @param saveModel
    * @return {Promise<void>}
    */
-  public createOrUpdate(model: ObservableModel<T | ModelWithId, ModelTypes>, saveModel: CreateRequest | UpdateRequest) {
+  public createOrUpdate(model: ObservableModel<T, ModelTypes>, saveModel: CreateRequest | UpdateRequest) {
     let apiPromise: Promise<any>;
 
     // TODO: add type checking for saveModel and isNewModel
@@ -169,7 +169,7 @@ export abstract class ModelRepository<
     });
   }
 
-  public getExistingModel(id: string): ObservableModel<T | ModelWithId, ModelTypes> {
+  public getExistingModel(id: string): ObservableModel<T, ModelTypes> {
     const existingModel = this.allModels.get(id);
 
     if (existingModel) {
@@ -280,7 +280,7 @@ export abstract class ModelRepository<
    * This method initiate a Model loading and deserializing/denormallizing
    * @param {ObservableModel<T extends ModelWithId>} model
    */
-  protected loadModel(model: ObservableModel<T | ModelWithId, ModelTypes>): void {
+  protected loadModel(model: ObservableModel<T, ModelTypes>): void {
     if (model._loadState.isPending()) {
       return;
     }
@@ -406,7 +406,7 @@ export abstract class ModelRepository<
    * @param rawModel - the model to be consumed
    * @param {ObservableModel<ModelWithId | T, ModelTypes extends string>} model - optional model to fill in
    */
-  public consumeModel(rawModel: any, model?: ObservableModel<T | ModelWithId, ModelTypes>): ObservableModel<T, ModelTypes> {
+  public consumeModel(rawModel: any, model?: ObservableModel<T, ModelTypes>): ObservableModel<T, ModelTypes> {
 
     const workingModel = model || this.getExistingModel(rawModel.id);
 
