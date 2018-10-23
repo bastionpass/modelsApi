@@ -128,6 +128,7 @@ export abstract class ModelRepository<
         .then((responseModel) => {
           // Push new model to default list
           this.consumeModel(responseModel, model);
+          this.allModels.set(model.id, model);
         });
     } else {
       apiPromise = this.update(saveModel as UpdateRequest)
