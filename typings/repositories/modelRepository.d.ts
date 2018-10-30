@@ -24,7 +24,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @param {string} id
      * @return {ObservableModel<ModelWithId | T>}
      */
-    getRawModel(id: string, load?: boolean): ObservableModel<T | ModelWithId, ModelTypes>;
+    getRawModel(id: string, load?: boolean): ObservableModel<T, ModelTypes>;
     isFullModel(model: any): model is T;
     getMetadata(): ModelMetadata;
     /**
@@ -40,7 +40,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * Use this method to create and later save a new model
      * @return {ObservableModel<T extends ModelWithId>}
      */
-    createNewModel(): ObservableModel<T | ModelWithId, ModelTypes>;
+    createNewModel(): ObservableModel<T, ModelTypes>;
     /**
      * Create or update model.
      * @param {ModelWithId} model - model, which will be full filled with value, but, should not be used further.
@@ -48,7 +48,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @param saveModel
      * @return {Promise<void>}
      */
-    createOrUpdate(model: ObservableModel<T | ModelWithId, ModelTypes>, saveModel: CreateRequest | UpdateRequest): Promise<any>;
+    createOrUpdate(model: ObservableModel<T, ModelTypes>, saveModel: CreateRequest | UpdateRequest): Promise<any>;
     deleteModel(model: T): Promise<void>;
     getExistingModel(id: string): ObservableModel<T, ModelTypes>;
     /**
@@ -123,7 +123,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @param rawModel - the model to be consumed
      * @param {ObservableModel<ModelWithId | T, ModelTypes extends string>} model - optional model to fill in
      */
-    consumeModel(rawModel: any, model?: ObservableModel<T | ModelWithId, ModelTypes>): ObservableModel<T, ModelTypes>;
+    consumeModel(rawModel: any, model?: ObservableModel<T, ModelTypes>): ObservableModel<T, ModelTypes>;
     getModelType(): ModelTypes;
     getMainRepository(): IMainRepository<ModelTypes>;
 }
