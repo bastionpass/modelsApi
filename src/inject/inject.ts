@@ -104,7 +104,7 @@ function propertyDecorator(target: any, propertyName: string) {
   const targetConstructor = target.constructor;
   const injectionConstructor = Reflect.getMetadata('design:type', target, propertyName);
 
-  checkInjectionType(target, injectionConstructor);
+  checkInjectionType(target, injectionConstructor, propertyName);
 
   Object.defineProperty(target, propertyName, {
     get() {
@@ -157,7 +157,7 @@ function parameterDecorator(target: any, parameterIndex: number) {
   const parametersTypes = Reflect.getMetadata('design:paramtypes', target);
 
   // Check, whether we can inject parameter of this type
-  checkInjectionType(target, parametersTypes[parameterIndex]);
+  checkInjectionType(target, parametersTypes[parameterIndex], parameterIndex);
 
   injectedParameters.push(parameterIndex);
 
@@ -219,13 +219,16 @@ function resolveDependencies(injectionConstructor: WithConstructor<any>,
   return resolvedDependencies;
 }
 
-function checkInjectionType(target: any, injectedType: any): injectedType is React.Component {
+function checkInjectionType(target: any, injectedType: any, propName: string|number): injectedType is React.Component {
+
+  const targetName = target.name || (target.constructor && target.constructor.name);
+
   if (!(injectedType && 'constructor' in injectedType)) {
-    throw new CoreError(`Injected type should be a class, but \'${injectedType}\' on ${target.name}. ` +
+    throw new CoreError(`Injected type should be a class, but \'${injectedType}\' on ${targetName} ${propName}. ` +
     'Check if you have a circular injection.');
   }
   if (/\{\s*\[native code\]\s*\}/.test(`${injectedType}`)) {
-    throw new CoreError(`Cannot inject native objects ${injectedType} on ${target}`);
+    throw new CoreError(`Cannot inject native objects ${injectedType} on ${targetName} ${propName}`);
   }
 
   return true;
