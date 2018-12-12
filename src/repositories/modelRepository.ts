@@ -411,6 +411,15 @@ export abstract class ModelRepository<
 
     const workingModel = model || this.getExistingModel(rawModel.id);
 
+    if (workingModel.id !== rawModel.id) {
+      workingModel._loadState = new ErrorState(
+        new CoreError(
+            `Consume error: you try to update model with id ${workingModel.id},
+             but recieved model id is ${rawModel.id}`,
+        ),
+      );
+    }
+
     if (isModelWithId(rawModel)) {
 
       const normalizingError = this.mainRepository.denormalizeModel(workingModel, rawModel, this.modelMetadata);
