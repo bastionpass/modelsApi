@@ -126,4 +126,9 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
     consumeModel(rawModel: any, model?: ObservableModel<T, ModelTypes>): ObservableModel<T, ModelTypes>;
     getModelType(): ModelTypes;
     getMainRepository(): IMainRepository<ModelTypes>;
+    /**
+     * This method clears all model and lists in the repository
+     * Though already existed model and lists will still be valid
+     */
+    clearRepository(): void;
 }

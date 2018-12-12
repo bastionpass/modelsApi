@@ -9,12 +9,12 @@ import {
 } from '../internals';
 import { Deserializer, ModelMetadata, ModelWithId } from 'swagger-ts-types';
 import { IMainRepository } from './IMainRepository';
-import autobind from 'autobind-decorator';
+import autobindDecorator from 'autobind-decorator';
 
 export type ModelRepositoriesMap<ModelTypes extends string> =
     Map<ModelTypes, ModelRepository<any, any, any, ModelTypes>>;
 
-@autobind
+@autobindDecorator
 export class MainRepository<ModelTypes extends string> implements IMainRepository<ModelTypes> {
 
   private modelRepositories: ModelRepositoriesMap<ModelTypes> = new Map();
@@ -99,5 +99,14 @@ export class MainRepository<ModelTypes extends string> implements IMainRepositor
 
   public registerModelRepository(modelType: ModelTypes, modelRepository: ModelRepository<any, any, any, ModelTypes>) {
     this.modelRepositories.set(modelType, modelRepository);
+  }
+
+  public clearRepositories() {
+    for (const key in this.modelRepositories) {
+      const repository = this.modelRepositories.get(key as ModelTypes);
+      if (repository) {
+        repository.clearRepository();
+      }
+    }
   }
 }

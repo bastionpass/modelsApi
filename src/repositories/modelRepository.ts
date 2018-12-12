@@ -1,4 +1,4 @@
-import { action, IObservableObject, observable, set} from 'mobx';
+import { IObservableObject, observable } from 'mobx';
 import { ObservableValue } from 'mobx/lib/types/observablevalue';
 import {
   ErrorState,
@@ -441,5 +441,14 @@ export abstract class ModelRepository<
 
   public getMainRepository() {
     return this.mainRepository;
+  }
+
+  /**
+   * This method clears all model and lists in the repository
+   * Though already existed model and lists will still be valid
+   */
+  public clearRepository() {
+    this.allModels = new Map();
+    this.lists = new Map();
   }
 }
