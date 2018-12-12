@@ -47,4 +47,10 @@ export interface IMainRepository<ModelTypes extends string> {
 
   registerModelRepository(modelType: ModelTypes, modelRepository: ModelRepository<any, any, any, ModelTypes>): void;
 
+  /**
+   * Clear all registered ModelRepositories
+   * Note, you have to manually clear CustomRepositories if they has such logic
+   */
+  clearRepositories(): void;
+
 }
