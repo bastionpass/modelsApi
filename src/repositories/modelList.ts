@@ -12,6 +12,11 @@ export interface ModelList<T extends ModelWithId> {
   readonly filter?: {[key in keyof T]?: T[key]};
 }
 
+export type Filter<T> = {
+  [P in keyof T]?: T[P] | (T[P])[];
+};
+
+
 export class ModelListImpl<T extends ModelWithId> implements ModelList<T> {
 
   @observable
@@ -99,7 +104,7 @@ export class FilteredModelListImpl<T extends ModelWithId> implements ModelList<T
     return this.$filter;
   }
 
-  private $filter: Partial<T>;
+  private $filter: Filter<T>;
 
   constructor(public name: string, originalList: ModelList<T>, filter: Partial<T>) {
     this.$originalList = originalList;

@@ -23,6 +23,7 @@ import {
   newModelId,
   serialize,
 } from 'swagger-ts-types';
+import { Filter } from './modelList';
 
 const defaultList = 'all';
 
@@ -199,7 +200,7 @@ export abstract class ModelRepository<
    * @param {{safe: Safe}} filter
    * @return {ModelListImpl<ObservableModel<T extends ModelWithId>>}
    */
-  public getFilteredList(filter: Partial<T>) {
+  public getFilteredList(filter: Filter<T>) {
     const listName = JSON.stringify(serialize(filter, [this.getMetadata()]));
     const all = this.getList();
     const filteredList = new FilteredModelListImpl<T>(listName, all, filter);
@@ -212,7 +213,7 @@ export abstract class ModelRepository<
    * @param {boolean} autoload
    * @return {ModelListImpl<ObservableModel<T extends ModelWithId>>}
    */
-  public getListImpl(name: string = defaultList, filter?: Partial<T>, autoload: boolean = true):
+  public getListImpl(name: string = defaultList, filter?: Filter<T>, autoload: boolean = true):
     ModelListImpl<ObservableModel<T, ModelTypes>> {
     const list = this.getExistingListImpl(name, filter);
 
@@ -227,7 +228,7 @@ export abstract class ModelRepository<
     return this.getExistingListImpl(name);
   }
 
-  public getExistingListImpl(name: string = defaultList, filter?: Partial<T>):
+  public getExistingListImpl(name: string = defaultList, filter?: Filter<T>):
     ModelListImpl<ObservableModel<T, ModelTypes>> {
     const existingList = this.lists.get(name);
     if (existingList) {
@@ -273,7 +274,7 @@ export abstract class ModelRepository<
    * @param {string} name
    * @return {ModelList<ObservableModel<T extends ModelWithId>> & IObservableObject}
    */
-  protected createEmptyList(name: string, filter?: Partial<T>): ModelListImpl<ObservableModel<T, ModelTypes>> {
+  protected createEmptyList(name: string, filter?: Filter<T>): ModelListImpl<ObservableModel<T, ModelTypes>> {
     return new ModelListImpl<ObservableModel<T, ModelTypes>>(name, this.loadList, filter);
   }
 
