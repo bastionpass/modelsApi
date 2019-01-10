@@ -1,6 +1,6 @@
 import { LoadState } from '../internals';
 import { computed, observable } from 'mobx';
-import { ModelWithId, isModelWithId } from 'swagger-ts-types';
+import { ModelWithId, isModelWithId, isArray } from 'swagger-ts-types';
 
 export interface ModelList<T extends ModelWithId> {
   readonly name: string;
@@ -68,18 +68,29 @@ export class FilteredModelListImpl<T extends ModelWithId> implements ModelList<T
     return this.$originalList.models.filter((model) => {
       for (const key in filter) {
         const prop = filter[key];
-        if (isModelWithId(prop) && isModelWithId(model[key])) {
-          if (prop.id !== model[key].id) {
-            return false;
-          }
-        } else {
-          if (prop !== model[key]) {
-            return false;
-          }
+        if (!this.compareFilterWithProp(filter[key], model[key])) {
+          return false;
         }
       }
       return true;
     });
+  }
+
+  protected compareFilterWithProp(filerProp: any, modelProp: any): boolean {
+    if (isModelWithId(filerProp) && isModelWithId(modelProp)) {
+      // Comparing two models
+      if (filerProp.id !== modelProp.id) {
+        return false;
+      }
+    } else if (isArray(filerProp)) {
+      return !!filerProp.find(item => this.compareFilterWithProp(item, modelProp));
+    } else {
+      // compare any other types
+      if (filerProp !== modelProp) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public invalidModels: any[] = [];

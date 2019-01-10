@@ -29,6 +29,7 @@ export declare class FilteredModelListImpl<T extends ModelWithId> implements Mod
     readonly loadState: LoadState;
     readonly total: number;
     readonly models: T[];
+    protected compareFilterWithProp(filerProp: any, modelProp: any): boolean;
     invalidModels: any[];
     readonly filter: Partial<T>;
     private $filter;
