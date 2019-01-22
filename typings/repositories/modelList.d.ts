@@ -11,6 +11,9 @@ export interface ModelList<T extends ModelWithId> {
         [key in keyof T]?: T[key];
     };
 }
+export declare type Filter<T> = {
+    [P in keyof T]?: T[P] | (T[P])[];
+};
 export declare class ModelListImpl<T extends ModelWithId> implements ModelList<T> {
     name: string;
     loadState: LoadState;
@@ -29,8 +32,9 @@ export declare class FilteredModelListImpl<T extends ModelWithId> implements Mod
     readonly loadState: LoadState;
     readonly total: number;
     readonly models: T[];
+    protected compareFilterWithProp(filerProp: any, modelProp: any): boolean;
     invalidModels: any[];
-    readonly filter: Partial<T>;
+    readonly filter: Filter<T>;
     private $filter;
     constructor(name: string, originalList: ModelList<T>, filter: Partial<T>);
     loadList(): Promise<any>;

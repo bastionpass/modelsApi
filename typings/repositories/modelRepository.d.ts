@@ -1,5 +1,6 @@
 import { ObservableOptionalModel, ObservableModel, IMainRepository, FilteredModelListImpl, ModelList, ModelListImpl, CustomRepository, Log } from '../internals';
 import { ModelMetadata, ModelWithId } from 'swagger-ts-types';
+import { Filter } from './modelList';
 export declare abstract class ModelRepository<T extends ModelWithId, CreateRequest, UpdateRequest, ModelTypes extends string> extends CustomRepository<ModelTypes> {
     protected isModel: (arg: any) => boolean;
     private asyncListProcess;
@@ -64,16 +65,16 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @param {{safe: Safe}} filter
      * @return {ModelListImpl<ObservableModel<T extends ModelWithId>>}
      */
-    getFilteredList(filter: Partial<T>): FilteredModelListImpl<T>;
+    getFilteredList(filter: Filter<T>): FilteredModelListImpl<T>;
     /**
      * internal use only
      * @param {string} name
      * @param {boolean} autoload
      * @return {ModelListImpl<ObservableModel<T extends ModelWithId>>}
      */
-    getListImpl(name?: string, filter?: Partial<T>, autoload?: boolean): ModelListImpl<ObservableModel<T, ModelTypes>>;
+    getListImpl(name?: string, filter?: Filter<T>, autoload?: boolean): ModelListImpl<ObservableModel<T, ModelTypes>>;
     getExistingList(name?: string): ModelList<ObservableModel<T, ModelTypes>>;
-    getExistingListImpl(name?: string, filter?: Partial<T>): ModelListImpl<ObservableModel<T, ModelTypes>>;
+    getExistingListImpl(name?: string, filter?: Filter<T>): ModelListImpl<ObservableModel<T, ModelTypes>>;
     /**
      * Implement in descendants
      * It should fetch model by Id or return null, if fetching single Model is not possible
@@ -96,7 +97,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @param {string} name
      * @return {ModelList<ObservableModel<T extends ModelWithId>> & IObservableObject}
      */
-    protected createEmptyList(name: string, filter?: Partial<T>): ModelListImpl<ObservableModel<T, ModelTypes>>;
+    protected createEmptyList(name: string, filter?: Filter<T>): ModelListImpl<ObservableModel<T, ModelTypes>>;
     /**
      * This method initiate a Model loading and deserializing/denormallizing
      * @param {ObservableModel<T extends ModelWithId>} model
@@ -126,4 +127,9 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
     consumeModel(rawModel: any, model?: ObservableModel<T, ModelTypes>): ObservableModel<T, ModelTypes>;
     getModelType(): ModelTypes;
     getMainRepository(): IMainRepository<ModelTypes>;
+    /**
+     * This method clears all model and lists in the repository
+     * Though already existed model and lists will still be valid
+     */
+    clearRepository(): void;
 }
