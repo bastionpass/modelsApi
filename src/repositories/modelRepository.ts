@@ -413,9 +413,12 @@ export abstract class ModelRepository<
     const workingModel = model || this.getExistingModel(rawModel.id);
 
     if (workingModel.id !== rawModel.id) {
+      this.log.warning(`Consume error: you try to update ${this.modelType} with id ${workingModel.id},
+             but recieved model id is ${rawModel.id}`);
       workingModel._loadState = new ErrorState(
         new CoreError(
-            `Consume error: you try to update model with id ${workingModel.id},
+            `Consume error: you try to update
+      this.log.warning(\`Consume error: you try to update  with id ${workingModel.id},
              but recieved model id is ${rawModel.id}`,
         ),
       );
