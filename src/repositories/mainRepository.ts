@@ -102,7 +102,7 @@ export class MainRepository<ModelTypes extends string> implements IMainRepositor
   }
 
   public clearRepositories() {
-    for (const key in this.modelRepositories) {
+    for (const key of this.modelRepositories.keys()) {
       const repository = this.modelRepositories.get(key as ModelTypes);
       if (repository) {
         repository.clearRepository();
