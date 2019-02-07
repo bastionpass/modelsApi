@@ -426,18 +426,32 @@ export abstract class ModelRepository<
 
     if (isModelWithId(rawModel)) {
 
-      const normalizingError = this.mainRepository.denormalizeModel(workingModel, rawModel, this.modelMetadata);
-      if (normalizingError) {
-        this.log.debug(`Load model denormalizing error: ${normalizingError.message}`);
-        workingModel._loadState = new ErrorState(normalizingError);
+      if(rawModel.metadata && rawModel.metadata.deleted) {
+
+        this.allModels.delete(rawModel.id);
+        for (const list of this.lists) {
+          const index = list[1].models.findIndex(model => model.id === rawModel.id);
+          if (index >= 0) {
+            list[1].models.splice(index, 1);
+          }
+        }
+
       } else {
-        workingModel._loadState = LoadState.done();
-        const allList = this.getExistingListImpl();
-        if (allList.models.indexOf(workingModel as ObservableModel<T, ModelTypes>) < 0) {
-          allList.models.unshift(workingModel as ObservableModel<T, ModelTypes>);
-          allList.total += 1;
+        const normalizingError = this.mainRepository.denormalizeModel(workingModel, rawModel, this.modelMetadata);
+        if (normalizingError) {
+          this.log.debug(`Load model denormalizing error: ${normalizingError.message}`);
+          workingModel._loadState = new ErrorState(normalizingError);
+        } else {
+          workingModel._loadState = LoadState.done();
+          const allList = this.getExistingListImpl();
+          if (allList.models.indexOf(workingModel as ObservableModel<T, ModelTypes>) < 0) {
+            allList.models.unshift(workingModel as ObservableModel<T, ModelTypes>);
+            allList.total += 1;
+          }
         }
       }
+
+
 
     } else {
       workingModel._loadState = new ErrorState(

@@ -277,4 +277,21 @@ describe('Repositories', () => {
     }
   });
 
+  it('Consume deleted model', () => {
+    const mainRepository = new MainRepository<ModelTypes>();
+    const myModelRepository = new MyModelRepository(mainRepository);
+    mainRepository.registerModelRepository(modelType as ModelTypes, myModelRepository);
+
+    myModelRepository.consumeModel(rawModel)
+
+    expect(myModelRepository.getList().models.length).toEqual(1);
+
+    myModelRepository.consumeModel({id:rawModel.id, metadata: {
+      deleted: true,
+    }});
+
+    expect(myModelRepository.getList().models.length).toEqual(0);
+
+  });
+
 });
