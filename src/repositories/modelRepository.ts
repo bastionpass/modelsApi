@@ -372,8 +372,8 @@ export abstract class ModelRepository<
     list.total = list.models.length;
   }
 
-  protected pushModelsToList(rawModels: any[],
-                             implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex: number = 0) {
+  public pushModelsToList(rawModels: any[],
+                          implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex: number = 0) {
 
     const list = implList || this.getList(defaultList, false) as ModelListImpl<ObservableModel<T, ModelTypes>>;
 
