@@ -155,13 +155,7 @@ export abstract class ModelRepository<
     return this.deleteOne(model).then(() => {
       if (realModel) {
         realModel._loadState = LoadState.done();
-        this.allModels.delete(model.id);
-        for (const list of this.lists) {
-          const index = list[1].models.indexOf(realModel);
-          if (index >= 0) {
-            list[1].models.splice(index, 1);
-          }
-        }
+        this.removeModelFromRepository(realModel);
       }
     }).catch((apiError: CoreError) => {
       if (realModel) {
@@ -169,6 +163,16 @@ export abstract class ModelRepository<
       }
       throw apiError;
     });
+  }
+
+  protected removeModelFromRepository(model: ObservableModel<T, ModelTypes>) {
+    this.allModels.delete(model.id);
+    for (const list of this.lists) {
+      const index = list[1].models.indexOf(model);
+      if (index >= 0) {
+        list[1].models.splice(index, 1);
+      }
+    }
   }
 
   public getExistingModel(id: string): ObservableModel<T, ModelTypes> {
@@ -412,37 +416,41 @@ export abstract class ModelRepository<
 
     const workingModel = model || this.getExistingModel(rawModel.id);
 
-    if (workingModel.id !== rawModel.id) {
-      this.log.warning(`Consume error: you try to update ${this.modelType} with id ${workingModel.id},
+    if (rawModel.metadata && rawModel.metadata.delete) {
+      this.removeModelFromRepository(workingModel);
+    } else {
+      if (workingModel.id !== rawModel.id) {
+        this.log.warning(`Consume error: you try to update ${this.modelType} with id ${workingModel.id},
              but recieved model id is ${rawModel.id}`);
-      workingModel._loadState = new ErrorState(
-        new CoreError(
+        workingModel._loadState = new ErrorState(
+          new CoreError(
             `Consume error: you try to update
       this.log.warning(\`Consume error: you try to update  with id ${workingModel.id},
              but recieved model id is ${rawModel.id}`,
-        ),
-      );
-    }
-
-    if (isModelWithId(rawModel)) {
-
-      const normalizingError = this.mainRepository.denormalizeModel(workingModel, rawModel, this.modelMetadata);
-      if (normalizingError) {
-        this.log.debug(`Load model denormalizing error: ${normalizingError.message}`);
-        workingModel._loadState = new ErrorState(normalizingError);
-      } else {
-        workingModel._loadState = LoadState.done();
-        const allList = this.getExistingListImpl();
-        if (allList.models.indexOf(workingModel as ObservableModel<T, ModelTypes>) < 0) {
-          allList.models.unshift(workingModel as ObservableModel<T, ModelTypes>);
-          allList.total += 1;
-        }
+          ),
+        );
       }
 
-    } else {
-      workingModel._loadState = new ErrorState(
-        new CoreError(`Denormalizing error: model has no id ${JSON.stringify(rawModel)}`),
-      );
+      if (isModelWithId(rawModel)) {
+
+        const normalizingError = this.mainRepository.denormalizeModel(workingModel, rawModel, this.modelMetadata);
+        if (normalizingError) {
+          this.log.debug(`Load model denormalizing error: ${normalizingError.message}`);
+          workingModel._loadState = new ErrorState(normalizingError);
+        } else {
+          workingModel._loadState = LoadState.done();
+          const allList = this.getExistingListImpl();
+          if (allList.models.indexOf(workingModel as ObservableModel<T, ModelTypes>) < 0) {
+            allList.models.unshift(workingModel as ObservableModel<T, ModelTypes>);
+            allList.total += 1;
+          }
+        }
+
+      } else {
+        workingModel._loadState = new ErrorState(
+          new CoreError(`Denormalizing error: model has no id ${JSON.stringify(rawModel)}`),
+        );
+      }
     }
 
     return workingModel as ObservableModel<T, ModelTypes>;
