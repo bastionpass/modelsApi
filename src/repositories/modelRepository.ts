@@ -155,7 +155,13 @@ export abstract class ModelRepository<
     return this.deleteOne(model).then(() => {
       if (realModel) {
         realModel._loadState = LoadState.done();
-        this.removeModelFromRepository(realModel);
+        this.allModels.delete(model.id);
+        for (const list of this.lists) {
+          const index = list[1].models.indexOf(realModel);
+          if (index >= 0) {
+            list[1].models.splice(index, 1);
+          }
+        }
       }
     }).catch((apiError: CoreError) => {
       if (realModel) {
@@ -163,16 +169,6 @@ export abstract class ModelRepository<
       }
       throw apiError;
     });
-  }
-
-  protected removeModelFromRepository(model: ObservableModel<T, ModelTypes>) {
-    this.allModels.delete(model.id);
-    for (const list of this.lists) {
-      const index = list[1].models.indexOf(model);
-      if (index >= 0) {
-        list[1].models.splice(index, 1);
-      }
-    }
   }
 
   public getExistingModel(id: string): ObservableModel<T, ModelTypes> {
@@ -376,8 +372,8 @@ export abstract class ModelRepository<
     list.total = list.models.length;
   }
 
-  protected pushModelsToList(rawModels: any[],
-                             implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex: number = 0) {
+  public pushModelsToList(rawModels: any[],
+                          implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex: number = 0) {
 
     const list = implList || this.getList(defaultList, false) as ModelListImpl<ObservableModel<T, ModelTypes>>;
 
@@ -416,23 +412,31 @@ export abstract class ModelRepository<
 
     const workingModel = model || this.getExistingModel(rawModel.id);
 
-    if (rawModel.metadata && rawModel.metadata.delete) {
-      this.removeModelFromRepository(workingModel);
-    } else {
-      if (workingModel.id !== rawModel.id) {
-        this.log.warning(`Consume error: you try to update ${this.modelType} with id ${workingModel.id},
+    if (workingModel.id !== rawModel.id) {
+      this.log.warning(`Consume error: you try to update ${this.modelType} with id ${workingModel.id},
              but recieved model id is ${rawModel.id}`);
-        workingModel._loadState = new ErrorState(
-          new CoreError(
+      workingModel._loadState = new ErrorState(
+        new CoreError(
             `Consume error: you try to update
       this.log.warning(\`Consume error: you try to update  with id ${workingModel.id},
              but recieved model id is ${rawModel.id}`,
-          ),
-        );
-      }
+        ),
+      );
+    }
 
-      if (isModelWithId(rawModel)) {
+    if (isModelWithId(rawModel)) {
 
+      if(rawModel.metadata && rawModel.metadata.deleted) {
+
+        this.allModels.delete(rawModel.id);
+        for (const list of this.lists) {
+          const index = list[1].models.findIndex(model => model.id === rawModel.id);
+          if (index >= 0) {
+            list[1].models.splice(index, 1);
+          }
+        }
+
+      } else {
         const normalizingError = this.mainRepository.denormalizeModel(workingModel, rawModel, this.modelMetadata);
         if (normalizingError) {
           this.log.debug(`Load model denormalizing error: ${normalizingError.message}`);
@@ -445,12 +449,14 @@ export abstract class ModelRepository<
             allList.total += 1;
           }
         }
-
-      } else {
-        workingModel._loadState = new ErrorState(
-          new CoreError(`Denormalizing error: model has no id ${JSON.stringify(rawModel)}`),
-        );
       }
+
+
+
+    } else {
+      workingModel._loadState = new ErrorState(
+        new CoreError(`Denormalizing error: model has no id ${JSON.stringify(rawModel)}`),
+      );
     }
 
     return workingModel as ObservableModel<T, ModelTypes>;

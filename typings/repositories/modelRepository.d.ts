@@ -118,7 +118,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @param {number} startIndex
      */
     consumeModels(rawModels: any[], implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex?: number): void;
-    protected pushModelsToList(rawModels: any[], implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex?: number): void;
+    pushModelsToList(rawModels: any[], implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex?: number): void;
     /**
      * This function is used to consume raw model into a repository
      * If needed this function unshifts a model into global list.
