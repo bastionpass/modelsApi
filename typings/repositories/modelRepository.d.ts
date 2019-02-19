@@ -51,6 +51,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      */
     createOrUpdate(model: ObservableModel<T, ModelTypes>, saveModel: CreateRequest | UpdateRequest): Promise<any>;
     deleteModel(model: T): Promise<void>;
+    protected removeModelFromRepository(model: ObservableModel<T, ModelTypes>): void;
     getExistingModel(id: string): ObservableModel<T, ModelTypes>;
     /**
      * The main entry point to get list of Models. The method immediately return observable list
