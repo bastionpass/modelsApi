@@ -1,6 +1,7 @@
 import { LoadState } from '../internals';
 import { computed, observable } from 'mobx';
 import { ModelWithId, isModelWithId, isArray } from 'swagger-ts-types';
+import { ModelRepository } from './modelRepository';
 
 export interface ModelList<T extends ModelWithId> {
   readonly name: string;
@@ -16,8 +17,25 @@ export type Filter<T> = {
   [P in keyof T]?: T[P] | (T[P])[];
 };
 
-
 export class ModelListImpl<T extends ModelWithId> implements ModelList<T> {
+
+  static deserialize<T extends ModelWithId>(
+    value: string,
+    getModel: (id: string) => ModelWithId,
+    loadList: (list: ModelListImpl<any>) => Promise<any>): ModelListImpl<T> | null {
+
+    try {
+      const data = JSON.parse(value);
+      const { name, filter, models } = data;
+      if (name && filter && models) {
+        const result = new ModelListImpl<T>(name, loadList, JSON.parse(filter));
+        models.forEach((modelId: string) => result.models.push(getModel(modelId) as any as T));
+        return result;
+      }
+    } catch (e) {
+    }
+    return null;
+  }
 
   @observable
   public loadState: LoadState = LoadState.none();
@@ -49,6 +67,14 @@ export class ModelListImpl<T extends ModelWithId> implements ModelList<T> {
 
   public loadList(): Promise<any> {
     return this.$loadList(this);
+  }
+
+  public serialize(): string {
+    return JSON.stringify({
+      name: this.name,
+      filter: this.$filter,
+      models: this.models.map(model => model.id),
+    });
   }
 
 }
