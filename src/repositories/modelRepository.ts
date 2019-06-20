@@ -1,4 +1,4 @@
-import { IObservableObject, observable } from 'mobx';
+import { action, IObservableObject, observable } from 'mobx';
 import { ObservableValue } from 'mobx/lib/types/observablevalue';
 import {
   ErrorState,
@@ -406,11 +406,10 @@ export abstract class ModelRepository<
    * This function is used to consume raw model into a repository
    * If needed this function unshifts a model into global list.
    * @param rawModel - the model to be consumed
-   * @param {ObservableModel<ModelWithId | T, ModelTypes extends string>} model - optional model to fill in
+   * @param deprecated {ObservableModel<ModelWithId | T, ModelTypes extends string>} model - optional model to fill in
    */
   public consumeModel(rawModel: any, model?: ObservableModel<T, ModelTypes>): ObservableModel<T, ModelTypes> {
-
-    const workingModel = model || this.getExistingModel(rawModel.id);
+    const workingModel = this.getExistingModel(rawModel.id);
 
     if (workingModel.id !== rawModel.id  && !isNewModel(workingModel)) {
       this.log.warning(`Consume error: you try to update ${this.modelType} with id ${workingModel.id},
@@ -426,7 +425,7 @@ export abstract class ModelRepository<
 
     if (isModelWithId(rawModel)) {
 
-      if(rawModel.metadata && rawModel.metadata.deleted) {
+      if (rawModel.metadata && rawModel.metadata.deleted) {
 
         this.allModels.delete(rawModel.id);
         for (const list of this.lists) {
@@ -450,8 +449,6 @@ export abstract class ModelRepository<
           }
         }
       }
-
-
 
     } else {
       workingModel._loadState = new ErrorState(

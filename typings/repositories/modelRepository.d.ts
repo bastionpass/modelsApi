@@ -51,7 +51,6 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      */
     createOrUpdate(model: ObservableModel<T, ModelTypes>, saveModel: CreateRequest | UpdateRequest): Promise<any>;
     deleteModel(model: T): Promise<void>;
-    protected removeModelFromRepository(model: ObservableModel<T, ModelTypes>): void;
     getExistingModel(id: string): ObservableModel<T, ModelTypes>;
     /**
      * The main entry point to get list of Models. The method immediately return observable list
@@ -123,7 +122,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * This function is used to consume raw model into a repository
      * If needed this function unshifts a model into global list.
      * @param rawModel - the model to be consumed
-     * @param {ObservableModel<ModelWithId | T, ModelTypes extends string>} model - optional model to fill in
+     * @param deprecated {ObservableModel<ModelWithId | T, ModelTypes extends string>} model - optional model to fill in
      */
     consumeModel(rawModel: any, model?: ObservableModel<T, ModelTypes>): ObservableModel<T, ModelTypes>;
     getModelType(): ModelTypes;

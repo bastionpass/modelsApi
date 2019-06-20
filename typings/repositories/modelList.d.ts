@@ -16,6 +16,7 @@ export declare type Filter<T> = {
 };
 export declare class ModelListImpl<T extends ModelWithId> implements ModelList<T> {
     name: string;
+    static deserialize<T extends ModelWithId>(value: string, getModel: (id: string) => ModelWithId, loadList: (list: ModelListImpl<any>) => Promise<any>): ModelListImpl<T> | null;
     loadState: LoadState;
     total: number;
     models: T[];
@@ -25,6 +26,7 @@ export declare class ModelListImpl<T extends ModelWithId> implements ModelList<T
     private $loadList;
     constructor(name: string, loadList: (list: ModelListImpl<any>) => Promise<any>, filter?: Partial<T>);
     loadList(): Promise<any>;
+    serialize(): string;
 }
 export declare class FilteredModelListImpl<T extends ModelWithId> implements ModelList<T> {
     name: string;
