@@ -121,7 +121,7 @@ export abstract class ModelRepository<
    * @return {Promise<void>}
    */
   public createOrUpdate(saveModel: CreateRequest | UpdateRequest) {
-    let apiPromise: Promise<any>;
+    let apiPromise: Promise<ObservableModel<T, ModelTypes>>;
 
     // TODO: add type checking for saveModel and isNewModel
     if (!isModelWithId(saveModel as any)) {
@@ -130,12 +130,14 @@ export abstract class ModelRepository<
           // Push new model to default list
           const model = this.consumeModel(responseModel);
           this.allModels.set(model.id, model);
+          return model;
         });
     } else {
       apiPromise = this.update(saveModel as UpdateRequest)
         .then((responseModel) => {
           const model = this.consumeModel(responseModel);
           this.allModels.set(model.id, model);
+          return model;
         });
     }
 
