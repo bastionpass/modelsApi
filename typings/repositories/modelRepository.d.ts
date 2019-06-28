@@ -49,7 +49,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @param saveModel
      * @return {Promise<void>}
      */
-    createOrUpdate(model: ObservableModel<T, ModelTypes>, saveModel: CreateRequest | UpdateRequest): Promise<any>;
+    createOrUpdate(saveModel: CreateRequest | UpdateRequest): Promise<any>;
     deleteModel(model: T): Promise<void>;
     getExistingModel(id: string): ObservableModel<T, ModelTypes>;
     /**
@@ -124,7 +124,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @param rawModel - the model to be consumed
      * @param deprecated {ObservableModel<ModelWithId | T, ModelTypes extends string>} model - optional model to fill in
      */
-    consumeModel(rawModel: any, model?: ObservableModel<T, ModelTypes>): ObservableModel<T, ModelTypes>;
+    consumeModel(rawModel: any): ObservableModel<T, ModelTypes>;
     getModelType(): ModelTypes;
     getMainRepository(): IMainRepository<ModelTypes>;
     /**
