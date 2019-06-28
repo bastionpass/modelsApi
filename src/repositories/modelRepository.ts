@@ -120,27 +120,30 @@ export abstract class ModelRepository<
    * @param saveModel
    * @return {Promise<void>}
    */
-  public createOrUpdate(model: ObservableModel<T, ModelTypes>, saveModel: CreateRequest | UpdateRequest) {
+  public createOrUpdate(saveModel: CreateRequest | UpdateRequest) {
     let apiPromise: Promise<any>;
 
     // TODO: add type checking for saveModel and isNewModel
-    if (isNewModel(model)) {
+    if (!isModelWithId(saveModel as any)) {
       apiPromise = this.create(saveModel as CreateRequest)
         .then((responseModel) => {
           // Push new model to default list
-          this.consumeModel(responseModel, model);
+          const model = this.consumeModel(responseModel);
           this.allModels.set(model.id, model);
         });
     } else {
       apiPromise = this.update(saveModel as UpdateRequest)
         .then((responseModel) => {
-          this.consumeModel(responseModel, model);
+          const model = this.consumeModel(responseModel);
           this.allModels.set(model.id, model);
         });
     }
 
     return apiPromise.catch((error: CoreError) => {
-      model._loadState = new ErrorState(error);
+      if (isModelWithId(saveModel)) {
+        const model = this.getExistingModel(saveModel.id);
+        model._loadState = new ErrorState(error);
+      }
       throw error;
     });
   }
@@ -292,7 +295,7 @@ export abstract class ModelRepository<
     const fetchPromise = this.fetchModel(model.id);
     if (fetchPromise) {
       fetchPromise.then((rawModel: any) => {
-        this.consumeModel(rawModel, model);
+        this.consumeModel(rawModel);
       }).catch((error: CoreError) => {
         model._loadState = new ErrorState(error);
       });
@@ -408,7 +411,7 @@ export abstract class ModelRepository<
    * @param rawModel - the model to be consumed
    * @param deprecated {ObservableModel<ModelWithId | T, ModelTypes extends string>} model - optional model to fill in
    */
-  public consumeModel(rawModel: any, model?: ObservableModel<T, ModelTypes>): ObservableModel<T, ModelTypes> {
+  public consumeModel(rawModel: any): ObservableModel<T, ModelTypes> {
     const workingModel = this.getExistingModel(rawModel.id);
 
     if (workingModel.id !== rawModel.id  && !isNewModel(workingModel)) {
