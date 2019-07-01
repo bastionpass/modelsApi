@@ -49,7 +49,8 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @param saveModel
      * @return {Promise<void>}
      */
-    createOrUpdate(saveModel: CreateRequest | UpdateRequest): Promise<ObservableModel<T, ModelTypes>>;
+    updateModel(id: string, saveModel: UpdateRequest): Promise<ObservableModel<T, ModelTypes>>;
+    createModel(saveModel: CreateRequest): Promise<ObservableModel<T, ModelTypes>>;
     deleteModel(model: T): Promise<void>;
     getExistingModel(id: string): ObservableModel<T, ModelTypes>;
     /**

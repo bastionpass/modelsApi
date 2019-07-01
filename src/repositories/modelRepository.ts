@@ -120,34 +120,27 @@ export abstract class ModelRepository<
    * @param saveModel
    * @return {Promise<void>}
    */
-  public createOrUpdate(saveModel: CreateRequest | UpdateRequest) {
-    let apiPromise: Promise<ObservableModel<T, ModelTypes>>;
-
-    // TODO: add type checking for saveModel and isNewModel
-    if (!isModelWithId(saveModel as any)) {
-      apiPromise = this.create(saveModel as CreateRequest)
-        .then((responseModel) => {
-          // Push new model to default list
-          const model = this.consumeModel(responseModel);
-          this.allModels.set(model.id, model);
-          return model;
-        });
-    } else {
-      apiPromise = this.update(saveModel as UpdateRequest)
-        .then((responseModel) => {
-          const model = this.consumeModel(responseModel);
-          this.allModels.set(model.id, model);
-          return model;
-        });
-    }
-
-    return apiPromise.catch((error: CoreError) => {
-      if (isModelWithId(saveModel)) {
-        const model = this.getExistingModel(saveModel.id);
+  public updateModel(id: string, saveModel: UpdateRequest) {
+    return  this.update(saveModel as UpdateRequest)
+      .then((responseModel) => {
+        const model = this.consumeModel(responseModel);
+        this.allModels.set(model.id, model);
+        return model;
+      }).catch((error) => {
+        const model = this.getExistingModel(id);
         model._loadState = new ErrorState(error);
-      }
-      throw error;
-    });
+        throw error;
+      });
+  }
+
+  public createModel(saveModel: CreateRequest) {
+    return this.create(saveModel)
+      .then((responseModel) => {
+        // Push new model to default list
+        const model = this.consumeModel(responseModel);
+        this.allModels.set(model.id, model);
+        return model;
+      });
   }
 
   public deleteModel(model: T): Promise<void> {
