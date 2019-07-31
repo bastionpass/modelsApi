@@ -72,7 +72,7 @@ export class MainRepository<ModelTypes extends string> implements IMainRepositor
     return (typeof arg === 'string') && this.modelRepositories.has(arg as ModelTypes);
   }
 
-  public validateModel(rawModel: ModelWithId, metadata: ModelMetadata): CoreError | null {
+  public validateModel(rawModel: any, metadata: ModelMetadata): CoreError | null {
     if (isObject(rawModel)) {
       for (const fieldName in metadata.fields) {
         const fieldMetadata = metadata.fields[fieldName];
