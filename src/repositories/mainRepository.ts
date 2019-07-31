@@ -7,7 +7,7 @@ import {
   CoreError,
   ModelRepository,
 } from '../internals';
-import { Deserializer, ModelMetadata, ModelWithId } from 'swagger-ts-types';
+import { Deserializer, Validator, ModelMetadata, ModelWithId, isObject } from 'swagger-ts-types';
 import { IMainRepository } from './IMainRepository';
 import autobindDecorator from 'autobind-decorator';
 
@@ -70,6 +70,29 @@ export class MainRepository<ModelTypes extends string> implements IMainRepositor
 
   public isKnownModelType = (arg: any): arg is ModelTypes => {
     return (typeof arg === 'string') && this.modelRepositories.has(arg as ModelTypes);
+  }
+
+  public validateModel(rawModel: ModelWithId, metadata: ModelMetadata): CoreError | null {
+    if (isObject(rawModel)) {
+      for (const fieldName in metadata.fields) {
+        const fieldMetadata = metadata.fields[fieldName];
+        const value = rawModel[fieldMetadata.apiField];
+
+        if (fieldMetadata.isRequired && value === void 0) {
+          return new CoreError(`Required field ${fieldMetadata.apiField} is undefined.`);
+        } else if (value !== void 0) {
+          for (const type of fieldMetadata.types) {
+            if (!Validator.isValidValue(value, [type])) {
+              return new CoreError(`Bad type or value ${JSON.stringify(fieldMetadata.types)} ` +
+                `of ${JSON.stringify(value)} for field ${JSON.stringify(fieldMetadata)} `);
+            }
+          }
+        }
+      }
+    } else {
+      return new CoreError(`Raw model is not an object: ${rawModel}`);
+    }
+    return null;
   }
 
   /**

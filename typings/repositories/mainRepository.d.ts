@@ -22,6 +22,7 @@ export declare class MainRepository<ModelTypes extends string> implements IMainR
     isFullModel<T extends ModelWithId>(model: T | ModelWithId, modelType: ModelTypes): model is T;
     getMetadata(modelType: ModelTypes): ModelMetadata | UnknownModelTypeError;
     isKnownModelType: (arg: any) => arg is ModelTypes;
+    validateModel(rawModel: ModelWithId, metadata: ModelMetadata): CoreError | null;
     /**
      * Denormalize, deserialize, and validate raw model, received from backend
      * Replaces links with real Models, and deserialize primitive types
