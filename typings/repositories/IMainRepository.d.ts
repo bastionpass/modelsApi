@@ -27,6 +27,7 @@ export interface IMainRepository<ModelTypes extends string> {
      * @param {ModelMetadata} metadata
      */
     denormalizeModel(model: ObservableModel<ModelWithId, ModelTypes>, rawModel: ModelWithId, metadata: ModelMetadata): CoreError | null;
+    validateModel(rawModel: ModelWithId, metadata: ModelMetadata): CoreError | null;
     registerModelRepository(modelType: ModelTypes, modelRepository: ModelRepository<any, any, any, ModelTypes>): void;
     /**
      * Clear all registered ModelRepositories
