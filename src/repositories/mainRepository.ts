@@ -122,9 +122,9 @@ export class MainRepository<ModelTypes extends string> implements IMainRepositor
         ` Errors: ${JSON.stringify(denormalizeResult.getErrors())}`);
   }
 
-  public registerRepository(repository: CustomRepository | ModelRepository<any, any, any, ModelTypes>) {
+  public registerRepository(repository: CustomRepository | ModelRepository<any, any, any, ModelTypes>, params: any) {
     if (repository instanceof ModelRepository) {
-      this.modelRepositories.set((repository as ModelRepository<any, any, any, ModelTypes>).getModelType(), repository);
+      this.modelRepositories.set(params, repository);
     } else {
       this.customRepositories.push(repository as CustomRepository);
     }

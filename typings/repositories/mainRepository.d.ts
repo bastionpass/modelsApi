@@ -32,6 +32,6 @@ export declare class MainRepository<ModelTypes extends string> implements IMainR
      * @param {ModelMetadata} metadata
      */
     denormalizeModel(model: ObservableModel<ModelWithId, ModelTypes>, rawModel: ModelWithId, metadata: ModelMetadata): CoreError | null;
-    registerRepository(repository: CustomRepository | ModelRepository<any, any, any, ModelTypes>): void;
+    registerRepository(repository: CustomRepository | ModelRepository<any, any, any, ModelTypes>, params: any): void;
     clearRepositories(): void;
 }

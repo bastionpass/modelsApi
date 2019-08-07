@@ -145,7 +145,7 @@ describe('Repositories', () => {
   it('Repository sanity check.', () => {
 
     const mainRepository = new MainRepository<ModelTypes>();
-    mainRepository.registerRepository(new MyModelRepository(mainRepository));
+    mainRepository.registerRepository(new MyModelRepository(mainRepository), modelType);
 
     const result = mainRepository.getRawModel(modelType as ModelTypes, modelId);
 
@@ -178,7 +178,7 @@ describe('Repositories', () => {
     expect.assertions(6);
 
     const mainRepository = new MainRepository<ModelTypes>();
-    mainRepository.registerRepository(new BadMyModelRepository(mainRepository));
+    mainRepository.registerRepository(new BadMyModelRepository(mainRepository), modelType);
 
     {
       const badRepo = mainRepository.getModelRepository<BadMyModelRepository>('Account' as ModelTypes);
@@ -212,7 +212,7 @@ describe('Repositories', () => {
     expect.assertions(5);
 
     const mainRepository = new MainRepository<ModelTypes>();
-    mainRepository.registerRepository(new MyModelRepository(mainRepository));
+    mainRepository.registerRepository(new MyModelRepository(mainRepository), modelType);
 
     const repo = mainRepository.getModelRepository<MyModelRepository>(modelType as ModelTypes);
     expect(repo).toBeInstanceOf(MyModelRepository);
@@ -242,7 +242,7 @@ describe('Repositories', () => {
     expect.assertions(5);
 
     const mainRepository = new MainRepository<ModelTypes>();
-    mainRepository.registerRepository(new MyModelRepository(mainRepository));
+    mainRepository.registerRepository(new MyModelRepository(mainRepository), modelType);
 
     const optionalModel = mainRepository.getModel(modelType as ModelTypes, modelId);
 
@@ -280,7 +280,7 @@ describe('Repositories', () => {
   it('Consume deleted model', () => {
     const mainRepository = new MainRepository<ModelTypes>();
     const myModelRepository = new MyModelRepository(mainRepository);
-    mainRepository.registerRepository(myModelRepository);
+    mainRepository.registerRepository(myModelRepository, modelType);
 
     myModelRepository.consumeModel(rawModel);
 

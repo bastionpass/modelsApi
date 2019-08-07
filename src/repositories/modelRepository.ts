@@ -50,7 +50,7 @@ export abstract class ModelRepository<
               protected isModel: (arg: any) => boolean,
               mainRepository: IMainRepository<ModelTypes>,
               private asyncListProcess: number = 10) {
-    super(mainRepository);
+    super(mainRepository, modelType);
   }
 
   /**
