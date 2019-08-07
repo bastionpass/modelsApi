@@ -1,7 +1,7 @@
 import { ObservableOptionalModel, ObservableModel, IMainRepository, FilteredModelListImpl, ModelList, ModelListImpl, CustomRepository, Log } from '../internals';
 import { ModelMetadata, ModelWithId } from 'swagger-ts-types';
 import { Filter } from './modelList';
-export declare abstract class ModelRepository<T extends ModelWithId, CreateRequest, UpdateRequest, ModelTypes extends string> extends CustomRepository<ModelTypes> {
+export declare abstract class ModelRepository<T extends ModelWithId, CreateRequest, UpdateRequest, ModelTypes extends string> extends CustomRepository {
     private modelType;
     private modelMetadata;
     protected isModel: (arg: any) => boolean;
@@ -127,7 +127,7 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      */
     consumeModel(rawModel: any): ObservableModel<T, ModelTypes>;
     getModelType(): ModelTypes;
-    getMainRepository(): IMainRepository<ModelTypes>;
+    getMainRepository(): IMainRepository<any>;
     /**
      * This method clears all model and lists in the repository
      * Though already existed model and lists will still be valid

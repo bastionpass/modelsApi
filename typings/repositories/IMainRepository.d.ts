@@ -29,7 +29,7 @@ export interface IMainRepository<ModelTypes extends string> {
      */
     denormalizeModel(model: ObservableModel<ModelWithId, ModelTypes>, rawModel: ModelWithId, metadata: ModelMetadata): CoreError | null;
     validateModel(rawModel: any, metadata: ModelMetadata): CoreError | null;
-    registerRepository(repository: CustomRepository<ModelTypes> | ModelRepository<any, any, any, ModelTypes>): void;
+    registerRepository(repository: CustomRepository | ModelRepository<any, any, any, ModelTypes>): void;
     /**
      * Clear all registered ModelRepositories
      * Note, you have to manually clear CustomRepositories if they has such logic

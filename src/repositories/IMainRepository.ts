@@ -48,7 +48,7 @@ export interface IMainRepository<ModelTypes extends string> {
 
   validateModel(rawModel: any, metadata: ModelMetadata): CoreError | null;
 
-  registerRepository(repository: CustomRepository<ModelTypes> | ModelRepository<any, any, any, ModelTypes>): void;
+  registerRepository(repository: CustomRepository | ModelRepository<any, any, any, ModelTypes>): void;
 
   /**
    * Clear all registered ModelRepositories

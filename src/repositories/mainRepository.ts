@@ -19,7 +19,7 @@ export type ModelRepositoriesMap<ModelTypes extends string> =
 export class MainRepository<ModelTypes extends string> implements IMainRepository<ModelTypes> {
 
   private modelRepositories: ModelRepositoriesMap<ModelTypes> = new Map();
-  private customRepositories: CustomRepository<ModelTypes>[] = [];
+  private customRepositories: CustomRepository[] = [];
 
   public getModelRepository<R extends ModelRepository<any, any, any, ModelTypes>>(modelType: ModelTypes):
       R | undefined {
@@ -122,11 +122,11 @@ export class MainRepository<ModelTypes extends string> implements IMainRepositor
         ` Errors: ${JSON.stringify(denormalizeResult.getErrors())}`);
   }
 
-  public registerRepository(repository: CustomRepository<ModelTypes> | ModelRepository<any, any, any, ModelTypes>) {
+  public registerRepository(repository: CustomRepository | ModelRepository<any, any, any, ModelTypes>) {
     if (repository instanceof ModelRepository) {
       this.modelRepositories.set((repository as ModelRepository<any, any, any, ModelTypes>).getModelType(), repository);
     } else {
-      this.customRepositories.push(repository as CustomRepository<ModelTypes>);
+      this.customRepositories.push(repository as CustomRepository);
     }
   }
 

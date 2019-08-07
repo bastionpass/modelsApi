@@ -32,7 +32,7 @@ export abstract class ModelRepository<
   T extends ModelWithId,
   CreateRequest,
   UpdateRequest,
-  ModelTypes extends string> extends CustomRepository<ModelTypes> {
+  ModelTypes extends string> extends CustomRepository {
 
   @inject
   protected log: Log;
