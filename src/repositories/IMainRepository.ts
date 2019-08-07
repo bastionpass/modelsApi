@@ -6,6 +6,7 @@ import {
   UnknownModelTypeError,
 } from '../internals';
 import { ObservableOptionalModel } from './optionalModel/ObservableOptionalModel';
+import { CustomRepository } from './customRepository';
 
 export interface IMainRepository<ModelTypes extends string> {
 
@@ -47,7 +48,7 @@ export interface IMainRepository<ModelTypes extends string> {
 
   validateModel(rawModel: any, metadata: ModelMetadata): CoreError | null;
 
-  registerModelRepository(modelType: ModelTypes, modelRepository: ModelRepository<any, any, any, ModelTypes>): void;
+  registerRepository(repository: CustomRepository<ModelTypes> | ModelRepository<any, any, any, ModelTypes>): void;
 
   /**
    * Clear all registered ModelRepositories

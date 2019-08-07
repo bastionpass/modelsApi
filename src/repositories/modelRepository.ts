@@ -37,9 +37,6 @@ export abstract class ModelRepository<
   @inject
   protected log: Log;
 
-  protected modelType: ModelTypes;
-  protected modelMetadata: ModelMetadata;
-
   @observable.shallow
   protected allModels: Map<string, ObservableModel<T, ModelTypes>> = new Map();
 
@@ -48,15 +45,12 @@ export abstract class ModelRepository<
 
   protected fetchPromises: Map<Object, Promise<any>> = new Map();
 
-  constructor(modelType: ModelTypes,
-              modelMetadata: ModelMetadata,
+  constructor(private modelType: ModelTypes,
+              private modelMetadata: ModelMetadata,
               protected isModel: (arg: any) => boolean,
               mainRepository: IMainRepository<ModelTypes>,
               private asyncListProcess: number = 10) {
     super(mainRepository);
-    mainRepository.registerModelRepository(modelType, this);
-    this.modelType = modelType;
-    this.modelMetadata = modelMetadata;
   }
 
   /**

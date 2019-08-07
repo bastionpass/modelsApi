@@ -1,6 +1,7 @@
 import { ModelMetadata, ModelWithId } from 'swagger-ts-types';
 import { CoreError, ModelRepository, ObservableModel, UnknownModelTypeError } from '../internals';
 import { ObservableOptionalModel } from './optionalModel/ObservableOptionalModel';
+import { CustomRepository } from './customRepository';
 export interface IMainRepository<ModelTypes extends string> {
     getModelRepository<R extends ModelRepository<any, any, any, ModelTypes>>(modelType: ModelTypes): R | undefined;
     /**
@@ -28,7 +29,7 @@ export interface IMainRepository<ModelTypes extends string> {
      */
     denormalizeModel(model: ObservableModel<ModelWithId, ModelTypes>, rawModel: ModelWithId, metadata: ModelMetadata): CoreError | null;
     validateModel(rawModel: any, metadata: ModelMetadata): CoreError | null;
-    registerModelRepository(modelType: ModelTypes, modelRepository: ModelRepository<any, any, any, ModelTypes>): void;
+    registerRepository(repository: CustomRepository<ModelTypes> | ModelRepository<any, any, any, ModelTypes>): void;
     /**
      * Clear all registered ModelRepositories
      * Note, you have to manually clear CustomRepositories if they has such logic

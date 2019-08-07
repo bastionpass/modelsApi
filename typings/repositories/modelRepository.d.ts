@@ -2,11 +2,11 @@ import { ObservableOptionalModel, ObservableModel, IMainRepository, FilteredMode
 import { ModelMetadata, ModelWithId } from 'swagger-ts-types';
 import { Filter } from './modelList';
 export declare abstract class ModelRepository<T extends ModelWithId, CreateRequest, UpdateRequest, ModelTypes extends string> extends CustomRepository<ModelTypes> {
+    private modelType;
+    private modelMetadata;
     protected isModel: (arg: any) => boolean;
     private asyncListProcess;
     protected log: Log;
-    protected modelType: ModelTypes;
-    protected modelMetadata: ModelMetadata;
     protected allModels: Map<string, ObservableModel<T, ModelTypes>>;
     protected lists: Map<string, ModelListImpl<ObservableModel<T, ModelTypes>>>;
     protected fetchPromises: Map<Object, Promise<any>>;

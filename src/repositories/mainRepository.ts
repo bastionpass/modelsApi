@@ -10,6 +10,7 @@ import {
 import { Deserializer, Validator, ModelMetadata, ModelWithId, isObject } from 'swagger-ts-types';
 import { IMainRepository } from './IMainRepository';
 import autobindDecorator from 'autobind-decorator';
+import { CustomRepository } from './customRepository';
 
 export type ModelRepositoriesMap<ModelTypes extends string> =
     Map<ModelTypes, ModelRepository<any, any, any, ModelTypes>>;
@@ -18,6 +19,7 @@ export type ModelRepositoriesMap<ModelTypes extends string> =
 export class MainRepository<ModelTypes extends string> implements IMainRepository<ModelTypes> {
 
   private modelRepositories: ModelRepositoriesMap<ModelTypes> = new Map();
+  private customRepositories: CustomRepository<ModelTypes>[] = [];
 
   public getModelRepository<R extends ModelRepository<any, any, any, ModelTypes>>(modelType: ModelTypes):
       R | undefined {
@@ -120,8 +122,12 @@ export class MainRepository<ModelTypes extends string> implements IMainRepositor
         ` Errors: ${JSON.stringify(denormalizeResult.getErrors())}`);
   }
 
-  public registerModelRepository(modelType: ModelTypes, modelRepository: ModelRepository<any, any, any, ModelTypes>) {
-    this.modelRepositories.set(modelType, modelRepository);
+  public registerRepository(repository: CustomRepository<ModelTypes> | ModelRepository<any, any, any, ModelTypes>) {
+    if (repository instanceof ModelRepository) {
+      this.modelRepositories.set((repository as ModelRepository<any, any, any, ModelTypes>).getModelType(), repository);
+    } else {
+      this.customRepositories.push(repository as CustomRepository<ModelTypes>);
+    }
   }
 
   public clearRepositories() {
@@ -131,5 +137,7 @@ export class MainRepository<ModelTypes extends string> implements IMainRepositor
         repository.clearRepository();
       }
     }
+
+    this.customRepositories.forEach(customRepository => customRepository.clearRepository());
   }
 }

@@ -12,7 +12,7 @@ import {
   LogLevel,
   initializeInject,
   InjectionMap,
-  ObservableModel
+  ObservableModel,
 } from '../../internals';
 
 import { autorun, isObservable } from 'mobx';
@@ -145,7 +145,7 @@ describe('Repositories', () => {
   it('Repository sanity check.', () => {
 
     const mainRepository = new MainRepository<ModelTypes>();
-    mainRepository.registerModelRepository(modelType as ModelTypes, new MyModelRepository(mainRepository));
+    mainRepository.registerRepository(new MyModelRepository(mainRepository));
 
     const result = mainRepository.getRawModel(modelType as ModelTypes, modelId);
 
@@ -178,7 +178,7 @@ describe('Repositories', () => {
     expect.assertions(6);
 
     const mainRepository = new MainRepository<ModelTypes>();
-    mainRepository.registerModelRepository(modelType as ModelTypes, new BadMyModelRepository(mainRepository));
+    mainRepository.registerRepository(new BadMyModelRepository(mainRepository));
 
     {
       const badRepo = mainRepository.getModelRepository<BadMyModelRepository>('Account' as ModelTypes);
@@ -212,7 +212,7 @@ describe('Repositories', () => {
     expect.assertions(5);
 
     const mainRepository = new MainRepository<ModelTypes>();
-    mainRepository.registerModelRepository(modelType as ModelTypes, new MyModelRepository(mainRepository));
+    mainRepository.registerRepository(new MyModelRepository(mainRepository));
 
     const repo = mainRepository.getModelRepository<MyModelRepository>(modelType as ModelTypes);
     expect(repo).toBeInstanceOf(MyModelRepository);
@@ -242,7 +242,7 @@ describe('Repositories', () => {
     expect.assertions(5);
 
     const mainRepository = new MainRepository<ModelTypes>();
-    mainRepository.registerModelRepository(modelType as ModelTypes, new MyModelRepository(mainRepository));
+    mainRepository.registerRepository(new MyModelRepository(mainRepository));
 
     const optionalModel = mainRepository.getModel(modelType as ModelTypes, modelId);
 
@@ -280,9 +280,9 @@ describe('Repositories', () => {
   it('Consume deleted model', () => {
     const mainRepository = new MainRepository<ModelTypes>();
     const myModelRepository = new MyModelRepository(mainRepository);
-    mainRepository.registerModelRepository(modelType as ModelTypes, myModelRepository);
+    mainRepository.registerRepository(myModelRepository);
 
-    myModelRepository.consumeModel(rawModel)
+    myModelRepository.consumeModel(rawModel);
 
     expect(myModelRepository.getList().models.length).toEqual(1);
 

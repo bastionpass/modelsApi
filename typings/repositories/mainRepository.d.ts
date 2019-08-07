@@ -1,9 +1,11 @@
 import { ObservableModel, ObservableOptionalModel, UnknownModelTypeError, CoreError, ModelRepository } from '../internals';
 import { ModelMetadata, ModelWithId } from 'swagger-ts-types';
 import { IMainRepository } from './IMainRepository';
+import { CustomRepository } from './customRepository';
 export declare type ModelRepositoriesMap<ModelTypes extends string> = Map<ModelTypes, ModelRepository<any, any, any, ModelTypes>>;
 export declare class MainRepository<ModelTypes extends string> implements IMainRepository<ModelTypes> {
     private modelRepositories;
+    private customRepositories;
     getModelRepository<R extends ModelRepository<any, any, any, ModelTypes>>(modelType: ModelTypes): R | undefined;
     /**
      * Entry point to get Model to work with, also, could be used particular repository getModel function
@@ -30,6 +32,6 @@ export declare class MainRepository<ModelTypes extends string> implements IMainR
      * @param {ModelMetadata} metadata
      */
     denormalizeModel(model: ObservableModel<ModelWithId, ModelTypes>, rawModel: ModelWithId, metadata: ModelMetadata): CoreError | null;
-    registerModelRepository(modelType: ModelTypes, modelRepository: ModelRepository<any, any, any, ModelTypes>): void;
+    registerRepository(repository: CustomRepository<ModelTypes> | ModelRepository<any, any, any, ModelTypes>): void;
     clearRepositories(): void;
 }
