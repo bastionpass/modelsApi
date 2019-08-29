@@ -1,4 +1,4 @@
-import { action, IObservableObject, observable } from 'mobx';
+import {action, IObservableObject, observable, set} from 'mobx';
 import { ObservableValue } from 'mobx/lib/types/observablevalue';
 import {
   ErrorState,
@@ -421,7 +421,7 @@ export abstract class ModelRepository<
         // If we have this model loaded, mark it as deleted
         if (this.hasModel(rawModel.id)) {
           const existingModel = this.getExistingModel(rawModel.id);
-          existingModel._loadState = LoadState.deleted();
+          set(existingModel, { _loadState: LoadState.deleted() });
         }
 
         this.allModels.delete(rawModel.id);
