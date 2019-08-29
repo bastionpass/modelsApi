@@ -9,12 +9,14 @@ export class LoadState {
   public static none(): NoneState { return noneState; }
   public static pending(): PendingState { return pendingState; }
   public static done(): DoneState { return doneState; }
+  public static deleted(): DeletedState { return deletedState; }
 
   public isNone(): this is NoneState { return this instanceof NoneState; }
   public isPending(): this is PendingState { return this instanceof PendingState; }
   public isDone(): this is DoneState { return this instanceof DoneState; }
   public isError(): this is ErrorState { return this instanceof ErrorState; }
   public isNoneOrPending(): boolean { return this instanceof PendingState || this instanceof NoneState; }
+  public isDeleted(): boolean { return this instanceof DeletedState; }
 }
 
 /**
@@ -31,6 +33,11 @@ export class PendingState extends LoadState {}
  * Model or List has been loaded and ready to use
  */
 export class DoneState extends LoadState {}
+
+/**
+ * Model has been deleted on API
+ */
+export class DeletedState extends LoadState {}
 
 /**
  * Error happened when it was been loaded
@@ -50,3 +57,4 @@ export class ErrorState extends LoadState {
 const noneState = new NoneState();
 const pendingState = new PendingState();
 const doneState = new DoneState();
+const deletedState = new DeletedState();

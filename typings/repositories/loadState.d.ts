@@ -6,11 +6,13 @@ export declare class LoadState {
     static none(): NoneState;
     static pending(): PendingState;
     static done(): DoneState;
+    static deleted(): DeletedState;
     isNone(): this is NoneState;
     isPending(): this is PendingState;
     isDone(): this is DoneState;
     isError(): this is ErrorState;
     isNoneOrPending(): boolean;
+    isDeleted(): boolean;
 }
 /**
  * Nothing has been doneState with the model, it wasn't been loaded, so you cannot use it
@@ -26,6 +28,11 @@ export declare class PendingState extends LoadState {
  * Model or List has been loaded and ready to use
  */
 export declare class DoneState extends LoadState {
+}
+/**
+ * Model has been deleted on API
+ */
+export declare class DeletedState extends LoadState {
 }
 /**
  * Error happened when it was been loaded

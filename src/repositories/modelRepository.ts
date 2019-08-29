@@ -418,6 +418,11 @@ export abstract class ModelRepository<
     if (isModelWithId(rawModel)) {
 
       if (rawModel.metadata && rawModel.metadata.deleted) {
+        // If we have this model loaded, mark it as deleted
+        if (this.hasModel(rawModel.id)) {
+          const existingModel = this.getExistingModel(rawModel.id);
+          existingModel._loadState = LoadState.deleted();
+        }
 
         this.allModels.delete(rawModel.id);
         for (const list of this.lists) {
