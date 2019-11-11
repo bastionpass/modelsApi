@@ -1,4 +1,4 @@
-import {action, IObservableObject, observable, set} from 'mobx';
+import { action, IObservableObject, observable, set } from 'mobx';
 import { ObservableValue } from 'mobx/lib/types/observablevalue';
 import {
   ErrorState,
@@ -383,6 +383,8 @@ export abstract class ModelRepository<
           const resultingIndex = Number(index) + startIndex;
           if (list.models.length > resultingIndex) {
             list.models[resultingIndex] = model;
+            // Remove duplicates from list
+            list.models = list.models.filter((model, index) => model.id === model.id && index !== resultingIndex);
           } else {
             list.models.push(model);
           }
