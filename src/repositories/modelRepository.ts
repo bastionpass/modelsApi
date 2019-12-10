@@ -390,7 +390,7 @@ export abstract class ModelRepository<
           if (list.models.length > resultingIndex) {
             list.models[resultingIndex] = model;
             // Remove duplicates from list
-            list.models = list.models.filter((existingModel, index) => existingModel.id === model.id && index !== resultingIndex);
+            list.models = list.models.filter((existingModel, existingIndex) => existingModel.id === model.id && existingIndex !== resultingIndex);
           } else {
             list.models.push(model);
           }
