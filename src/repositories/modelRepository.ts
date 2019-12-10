@@ -374,7 +374,8 @@ export abstract class ModelRepository<
 
     const list = implList || this.getList(defaultList, false) as ModelListImpl<ObservableModel<T, ModelTypes>>;
 
-    for (const index in rawModels) {
+    for (const rawIndex in rawModels) {
+      const index = Number(rawIndex);
       const rawModel = rawModels[index];
       if (isModelWithId(rawModel)) {
         const model = this.getExistingModel(rawModel.id);
