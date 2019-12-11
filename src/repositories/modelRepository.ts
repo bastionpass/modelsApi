@@ -327,7 +327,7 @@ export abstract class ModelRepository<
       this.pushModelsToList(rawModels, list, startingIndex);
     };
 
-    const fetchPromise = this.fetchList(list.name, intermediateConsume).then((rawModels: any[]) => {
+    const fetchPromise = this.fetchList(list.name, intermediateConsume).then(action((rawModels: any[]) => {
       // If we didn't consumed models before, replace the list totally
       if (!intermediateConsumed) {
         list.models = [];
@@ -335,7 +335,7 @@ export abstract class ModelRepository<
       this.consumeModels(rawModels, list);
       this.fetchPromises.delete(list);
       return list;
-    }).catch((error: CoreError) => {
+    })).catch((error: CoreError) => {
       list.loadState = new ErrorState(error);
       this.fetchPromises.delete(list);
       if (!(error instanceof CoreError)) {
