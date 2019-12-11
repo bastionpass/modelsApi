@@ -320,11 +320,18 @@ export abstract class ModelRepository<
 
     list.loadState = LoadState.pending();
 
+    let intermediateConsumed = false;
+
     const intermediateConsume = (rawModels: any[], startingIndex: number) => {
+      intermediateConsumed = true;
       this.pushModelsToList(rawModels, list, startingIndex);
     };
 
     const fetchPromise = this.fetchList(list.name, intermediateConsume).then((rawModels: any[]) => {
+      // If we didn't consumed models before, replace the list totally
+      if (!intermediateConsumed) {
+        list.models = [];
+      }
       this.consumeModels(rawModels, list);
       this.fetchPromises.delete(list);
       return list;
@@ -353,12 +360,7 @@ export abstract class ModelRepository<
 
     const list = implList || this.getList(defaultList, false) as ModelListImpl<ObservableModel<T, ModelTypes>>;
 
-    // Special case, when removing the last model from the list
-    if (rawModels.length === 0 && startIndex === 0) {
-      list.models = [];
-    } else {
-      this.pushModelsToList(rawModels, list, startIndex);
-    }
+    this.pushModelsToList(rawModels, list, startIndex);
 
     list.loadState = list.invalidModels.length
       ? new ErrorState(
