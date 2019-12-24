@@ -133,4 +133,5 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * Though already existed model and lists will still be valid
      */
     clearRepository(): void;
+    protected makeCancellable<T>(src: T): T;
 }

@@ -281,8 +281,9 @@ export abstract class ModelRepository<
 
     model._loadState = LoadState.pending();
 
-    const fetchPromise = this.fetchModel(model.id);
+    const fetchPromise = this.makeCancellable(this.fetchModel(model.id));
     if (fetchPromise) {
+      this.fetchPromises.set(model, fetchPromise);
       fetchPromise.then((rawModel: any) => {
         this.consumeModel(rawModel);
       }).catch((error: CoreError) => {
@@ -327,21 +328,23 @@ export abstract class ModelRepository<
       this.pushModelsToList(rawModels, list, startingIndex);
     };
 
-    const fetchPromise = this.fetchList(list.name, intermediateConsume).then(action((rawModels: any[]) => {
-      // If we didn't consumed models before, replace the list totally
-      if (!intermediateConsumed) {
-        list.models = [];
-      }
-      this.consumeModels(rawModels, list);
-      this.fetchPromises.delete(list);
-      return list;
-    })).catch((error: CoreError) => {
-      list.loadState = new ErrorState(error);
-      this.fetchPromises.delete(list);
-      if (!(error instanceof CoreError)) {
-        throw error;
-      }
-    });
+    const fetchPromise = this.makeCancellable(
+      this.fetchList(list.name, intermediateConsume).then(action((rawModels: any[]) => {
+        // If we didn't consumed models before, replace the list totally
+        if (!intermediateConsumed) {
+          list.models = [];
+        }
+        this.consumeModels(rawModels, list);
+        this.fetchPromises.delete(list);
+        return list;
+      })).catch((error: CoreError) => {
+        list.loadState = new ErrorState(error);
+        this.fetchPromises.delete(list);
+        if (!(error instanceof CoreError)) {
+          throw error;
+        }
+      }),
+    );
 
     this.fetchPromises.set(list, fetchPromise);
 
@@ -479,7 +482,23 @@ export abstract class ModelRepository<
    * Though already existed model and lists will still be valid
    */
   public clearRepository() {
+    this.fetchPromises.forEach(promise => (promise as any).cancel());
     this.allModels = new Map();
     this.lists = new Map();
+  }
+
+  protected makeCancellable<T>(src: T): T {
+    if (!(src instanceof Promise)) {
+      return src;
+    }
+
+    let active = true;
+    const wrappedPromise = new Promise<T>((resolve, reject) => {
+      src.then(result => active && resolve(result));
+      src.catch(error => active && reject(error));
+    });
+
+    (wrappedPromise as any).cancel = () => active = false;
+    return wrappedPromise as any as T;
   }
 }
