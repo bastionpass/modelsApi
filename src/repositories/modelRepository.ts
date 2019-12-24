@@ -483,6 +483,7 @@ export abstract class ModelRepository<
    */
   public clearRepository() {
     this.fetchPromises.forEach(promise => (promise as any).cancel());
+    this.fetchPromises.clear();
     this.allModels = new Map();
     this.lists = new Map();
   }

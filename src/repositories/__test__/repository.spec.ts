@@ -100,7 +100,7 @@ class MyModelRepository extends ModelRepository<MyModel,
   }
 
   protected fetchList(name: string): Promise<any[]> {
-    return new Promise(resolve => resolve([rawModel]));
+    return new Promise(resolve => setTimeout(() => resolve([rawModel]), 100));
   }
 
   protected create(saveModel: MyModelRequestResponse) {
