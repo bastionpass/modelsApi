@@ -374,6 +374,7 @@ export abstract class ModelRepository<
     list.total = list.models.length;
   }
 
+  @action
   public pushModelsToList(rawModels: any[],
                           implList?: ModelListImpl<ObservableModel<T, ModelTypes>>, startIndex: number = 0) {
 
