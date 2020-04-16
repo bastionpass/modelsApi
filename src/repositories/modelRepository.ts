@@ -395,8 +395,6 @@ export abstract class ModelRepository<
           const resultingIndex = Number(index) + startIndex;
           if (list.models.length > resultingIndex) {
             list.models[resultingIndex] = model;
-            // Remove duplicates from list
-            list.models = list.models.filter((existingModel, existingIndex) => !(existingModel.id === model.id && existingIndex !== resultingIndex));
           } else {
             list.models.push(model);
           }
@@ -406,6 +404,21 @@ export abstract class ModelRepository<
         list.invalidModels.push(rawModel);
       }
     }
+    
+    /**
+     * Removing duplicates from models list.
+     * Note, that last added or replaced model with specified id considered as source of truth.
+     */
+    const modelIds: Set<string> = new Set();
+    const modelsList: T[] = [];
+    for (let i = list.models.length - 1; i > -1; i--) {
+      const modelId = list.models[i].id;
+      if (!modelIds.has(modelId)) {
+        modelsList.push(list.models[i]);
+      }
+      modelIds.add(modelId);
+    }
+    list.models = modelsList.reverse();
   }
 
   /**
