@@ -1,4 +1,3 @@
-/// <reference types="react" />
 declare type RefHandler = (instance: React.ReactInstance) => any;
 /**
  * Creates React.Component ref handler and memoize it

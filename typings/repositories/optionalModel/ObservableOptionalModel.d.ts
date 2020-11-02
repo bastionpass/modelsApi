@@ -35,7 +35,7 @@ export declare class ObservableOptionalModelWithOnEmpty<T extends ModelWithId, E
     protected onEmptyCallback: (model: ModelWithId | undefined | null) => ER;
     constructor(model: ObservableModel<T | ModelWithId, ModelTypes>, modelType: ModelTypes, mainRepository: IMainRepository<ModelTypes>, onEmptyCallback: (model: ModelWithId | undefined | null) => ER);
     onFull<FR>(onFullCallback: ((model: T) => FR)): ObservableOptionalModelWithOnEmptyOnFull<T, ER, FR, ModelTypes>;
-    readonly result: ER | undefined;
+    get result(): ER | undefined;
     getModel(): ObservableModel<T | ModelWithId, ModelTypes>;
     getModelType(): ModelTypes;
     getMainRepository(): IMainRepository<ModelTypes>;
@@ -47,7 +47,7 @@ export declare class ObservableOptionalModelWithOnFull<T extends ModelWithId, FR
     protected onFullCallback: (model: T) => FR;
     constructor(model: ObservableModel<T | ModelWithId, ModelTypes>, modelType: ModelTypes, mainRepository: IMainRepository<ModelTypes>, onFullCallback: (model: T) => FR);
     onEmpty<ER>(onEmptyCallback: ((model: ModelWithId | undefined | null) => ER)): OptionalModelWithOnEmptyOnFull<T, ER, FR>;
-    readonly result: FR | undefined;
+    get result(): FR | undefined;
     getModel(): ObservableModel<T | ModelWithId, ModelTypes>;
     getModelType(): ModelTypes;
     getMainRepository(): IMainRepository<ModelTypes>;
@@ -59,7 +59,7 @@ export declare class ObservableOptionalModelWithOnEmptyOnFull<T extends ModelWit
     protected onEmptyCallback: (model: ModelWithId | undefined | null) => ER;
     protected onFullCallback: (model: T) => FR;
     constructor(model: ObservableModel<T | ModelWithId, ModelTypes>, modelType: ModelTypes, mainRepository: IMainRepository<ModelTypes>, onEmptyCallback: (model: ModelWithId | undefined | null) => ER, onFullCallback: (model: T) => FR);
-    readonly result: ER | FR;
+    get result(): ER | FR;
     getModel(): ObservableModel<T | ModelWithId, ModelTypes>;
     getModelType(): ModelTypes;
     getMainRepository(): IMainRepository<ModelTypes>;

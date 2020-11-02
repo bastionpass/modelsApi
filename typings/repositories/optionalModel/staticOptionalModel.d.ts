@@ -17,7 +17,7 @@ export declare class StaticOptionalModelWithOnEmpty<T extends ModelWithId, ER> i
     protected onEmptyCallback: (model: ModelWithId | undefined | null) => ER;
     constructor(model: T | ModelWithId | undefined | null, onEmptyCallback: (model: ModelWithId | undefined | null) => ER);
     onFull<FR>(onFullCallback: ((model: T) => FR)): StaticOptionalModelWithOnEmptyOnFull<T, ER, FR>;
-    readonly result: ER | undefined;
+    get result(): ER | undefined;
     getModel(): T | ModelWithId | undefined | null;
 }
 export declare class StaticOptionalModelWithOnFull<T extends ModelWithId, FR> implements OptionalModelWithOnFull<T, FR> {
@@ -25,7 +25,7 @@ export declare class StaticOptionalModelWithOnFull<T extends ModelWithId, FR> im
     protected onFullCallback: (model: T) => FR;
     constructor(model: T | ModelWithId | undefined | null, onFullCallback: (model: T) => FR);
     onEmpty<ER>(onEmptyCallback: ((model: ModelWithId | undefined | null) => ER)): StaticOptionalModelWithOnEmptyOnFull<T, ER, FR>;
-    readonly result: FR | undefined;
+    get result(): FR | undefined;
     getModel(): T | ModelWithId | undefined | null;
 }
 export declare class StaticOptionalModelWithOnEmptyOnFull<T extends ModelWithId, ER, FR> implements OptionalModelWithOnEmptyOnFull<T, ER, FR> {
@@ -33,7 +33,7 @@ export declare class StaticOptionalModelWithOnEmptyOnFull<T extends ModelWithId,
     protected onEmptyCallback: (model: ModelWithId | undefined | null) => ER;
     protected onFullCallback: (model: T) => FR;
     constructor(model: T | ModelWithId | undefined | null, onEmptyCallback: (model: ModelWithId | undefined | null) => ER, onFullCallback: (model: T) => FR);
-    readonly result: ER | FR;
+    get result(): ER | FR;
     getModel(): T | ModelWithId | undefined | null;
 }
 /**

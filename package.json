@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/apz77/modelsApi#readme",
   "dependencies": {
+    "@types/node": "^14.14.6",
     "autobind-decorator": "^2.1.0",
     "reflect-metadata": "^0.1.12",
     "swagger-ts-types": "git+https://github.com/apz77/swagger-ts-types.git"
@@ -30,7 +31,7 @@
   "devDependencies": {
     "tslint": "^5.9.1",
     "tslint-config-airbnb": "^5.8.0",
-    "typescript": "^2.7.2",
+    "typescript": "^3.4.3",
     "jest": "22.4.3",
     "react": "16.3.1",
     "mobx": "^5.13.0",

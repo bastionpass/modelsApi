@@ -1,39 +1,38 @@
-import { LoadState } from '../internals';
-import { computed, observable } from 'mobx';
-import { ModelWithId, isModelWithId, isArray } from 'swagger-ts-types';
-import { ModelRepository } from './modelRepository';
+import { computed, observable } from "mobx";
+import { isArray, isModelWithId, ModelWithId } from "swagger-ts-types";
+import { LoadState } from "../internals";
 
 export interface ModelList<T extends ModelWithId> {
   readonly name: string;
   readonly loadState: LoadState; // Load state of the List
-  readonly total: number;        // Total number of items
-  readonly models: T[];          // valid loaded models
+  readonly total: number; // Total number of items
+  readonly models: T[]; // valid loaded models
   readonly invalidModels: any[]; // invalid loaded models
-  readonly loadList: () => Promise<any>;  // Load current list
-  readonly filter?: {[key in keyof T]?: T[key]};
+  readonly loadList: () => Promise<any>; // Load current list
+  readonly filter?: Filter<T>;
 }
 
 export type Filter<T> = {
-  [P in keyof T]?: T[P] | (T[P])[];
+  [P in keyof T]?: T[P] | T[P][];
 };
 
 export class ModelListImpl<T extends ModelWithId> implements ModelList<T> {
-
   static deserialize<T extends ModelWithId>(
     value: string,
     getModel: (id: string) => ModelWithId,
-    loadList: (list: ModelListImpl<any>) => Promise<any>): ModelListImpl<T> | null {
-
+    loadList: (list: ModelListImpl<any>) => Promise<any>
+  ): ModelListImpl<T> | null {
     try {
       const data = JSON.parse(value);
       const { name, filter, models } = data;
       if (name && filter && models) {
         const result = new ModelListImpl<T>(name, loadList, JSON.parse(filter));
-        models.forEach((modelId: string) => result.models.push(getModel(modelId) as any as T));
+        models.forEach((modelId: string) =>
+          result.models.push((getModel(modelId) as any) as T)
+        );
         return result;
       }
-    } catch (e) {
-    }
+    } catch (e) {}
     return null;
   }
 
@@ -53,14 +52,15 @@ export class ModelListImpl<T extends ModelWithId> implements ModelList<T> {
     return this.$filter;
   }
 
-  private $filter?: Partial<T>;
+  private $filter?: Filter<T>;
 
   private $loadList: (list: ModelListImpl<any>) => Promise<any>;
 
-  constructor(public name: string,
-              loadList: (list: ModelListImpl<any>) => Promise<any>,
-              filter?: Partial<T>) {
-
+  constructor(
+    public name: string,
+    loadList: (list: ModelListImpl<any>) => Promise<any>,
+    filter?: Filter<T>
+  ) {
     this.$loadList = loadList;
     this.$filter = filter;
   }
@@ -73,14 +73,13 @@ export class ModelListImpl<T extends ModelWithId> implements ModelList<T> {
     return JSON.stringify({
       name: this.name,
       filter: this.$filter,
-      models: this.models.map(model => model.id),
+      models: this.models.map((model) => model.id),
     });
   }
-
 }
 
-export class FilteredModelListImpl<T extends ModelWithId> implements ModelList<T> {
-
+export class FilteredModelListImpl<T extends ModelWithId>
+  implements ModelList<T> {
   private $originalList: ModelList<T>;
 
   @computed
@@ -114,7 +113,9 @@ export class FilteredModelListImpl<T extends ModelWithId> implements ModelList<T
         return false;
       }
     } else if (isArray(filerProp)) {
-      return !!filerProp.find(item => this.compareFilterWithProp(item, modelProp));
+      return !!filerProp.find((item) =>
+        this.compareFilterWithProp(item, modelProp)
+      );
     } else {
       // compare any other types
       if (filerProp !== modelProp) {
@@ -132,7 +133,11 @@ export class FilteredModelListImpl<T extends ModelWithId> implements ModelList<T
 
   private $filter: Filter<T>;
 
-  constructor(public name: string, originalList: ModelList<T>, filter: Partial<T>) {
+  constructor(
+    public name: string,
+    originalList: ModelList<T>,
+    filter: Filter<T>
+  ) {
     this.$originalList = originalList;
     this.$filter = filter;
   }
