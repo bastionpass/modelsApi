@@ -110,6 +110,10 @@ export declare abstract class ModelRepository<T extends ModelWithId, CreateReque
      * @param {ModelList<ObservableModel<T extends ModelWithId>> & IObservableObject} list
      */
     protected loadList: (list: ModelListImpl<ObservableModel<T, ModelTypes>>) => Promise<any>;
+    getIntermediateConsume(list?: ModelListImpl<ObservableModel<T, ModelTypes>>): {
+        (this: ModelRepository<T, CreateRequest, UpdateRequest, ModelTypes>, rawModels: any[], startingIndex: number): void;
+        intermediateConsumed: boolean;
+    };
     /**
      * This method consumes an array of models and replaces them in a given list starting from provided index
      * It does not pushes models into allList, thou it updates models, tha could be in other lists as well.

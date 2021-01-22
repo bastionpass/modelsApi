@@ -365,19 +365,14 @@ export abstract class ModelRepository<
 
     list.loadState = LoadState.pending();
 
-    let intermediateConsumed = false;
-
-    const intermediateConsume = (rawModels: any[], startingIndex: number) => {
-      intermediateConsumed = true;
-      this.pushModelsToList(rawModels, list, startingIndex);
-    };
+    const intermediateConsume = this.getIntermediateConsume(list);
 
     const fetchPromise = this.makeCancellable(
       this.fetchList(list.name, intermediateConsume)
         .then(
           action((rawModels: any[]) => {
             // If we didn't consumed models before, replace the list totally
-            if (!intermediateConsumed) {
+            if (!intermediateConsume.intermediateConsumed) {
               list.models = [];
             }
             this.consumeModels(rawModels, list);
@@ -398,6 +393,18 @@ export abstract class ModelRepository<
 
     return fetchPromise;
   };
+
+  public getIntermediateConsume(list?: ModelListImpl<ObservableModel<T, ModelTypes>>): {
+    (this: ModelRepository<T, CreateRequest, UpdateRequest, ModelTypes>, rawModels: any[], startingIndex: number): void;
+    intermediateConsumed: boolean;
+  } {
+    const intermediateConsume: any = (rawModels: any[], startingIndex: number) => {
+      intermediateConsume.intermediateConsumed = true;
+      this.pushModelsToList(rawModels, list, startingIndex);
+    };
+    intermediateConsume.intermediateConsumed = false;
+    return intermediateConsume;
+  }
 
   /**
    * This method consumes an array of models and replaces them in a given list starting from provided index
